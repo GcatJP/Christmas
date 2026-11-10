@@ -1,0 +1,1349 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Word up</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#0b2f3a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Christmas" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="apple-touch-icon" href="images/icon.png" />
+    <link rel="icon" type="image/png" href="images/icon.png" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Mountains+of+Christmas:wght@700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg1: #07222b;
+        --bg2: #0e4150;
+        --bg3: #1b6b6f;
+        --red: #d7263d;
+        --bad: #e8384f;
+        --gold: #ffcf4a;
+        --cream: #fffaf0;
+        --green: #38c172;
+        --font:
+          "Fredoka", "Chalkboard SE", "Hiragino Maru Gothic ProN",
+          "Comic Sans MS", system-ui, sans-serif;
+        --title:
+          "Mountains of Christmas", "Fredoka", "Hiragino Maru Gothic ProN",
+          cursive, system-ui, sans-serif;
+        --top: calc(env(safe-area-inset-top, 0px) + 88px);
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg1);
+        font-family: var(--font);
+        color: var(--cream);
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+      }
+      body {
+        background:
+          radial-gradient(
+            ellipse at 15% 0%,
+            rgba(80, 220, 160, 0.28),
+            transparent 45%
+          ),
+          radial-gradient(
+            ellipse at 90% 10%,
+            rgba(215, 38, 61, 0.22),
+            transparent 40%
+          ),
+          linear-gradient(
+            180deg,
+            var(--bg1) 0%,
+            var(--bg2) 60%,
+            var(--bg3) 100%
+          );
+      }
+
+      /* ---------- decorations ---------- */
+      #lights {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: calc(env(safe-area-inset-top, 0px) + 30px);
+        z-index: 3;
+        pointer-events: none;
+      }
+      .bulb {
+        position: absolute;
+        width: 10px;
+        height: 15px;
+        border-radius: 50% 50% 55% 55%;
+        background: var(--c);
+        box-shadow: 0 0 10px 3px var(--c);
+        animation: glow 1.8s infinite ease-in-out;
+      }
+      .bulb::before {
+        content: "";
+        position: absolute;
+        left: 2px;
+        top: -4px;
+        width: 6px;
+        height: 5px;
+        background: #2b3a3f;
+        border-radius: 2px;
+      }
+      @keyframes glow {
+        0%,
+        100% {
+          opacity: 0.55;
+          transform: scale(0.92);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.08);
+        }
+      }
+      .flake {
+        position: fixed;
+        top: -10px;
+        border-radius: 50%;
+        background: #fff;
+        z-index: 0;
+        pointer-events: none;
+        animation: snowfall linear infinite;
+      }
+      @keyframes snowfall {
+        from {
+          transform: translate(0, -5vh);
+        }
+        to {
+          transform: translate(var(--dx), 108vh);
+        }
+      }
+
+      /* ---------- top buttons ---------- */
+      .round {
+        position: fixed;
+        z-index: 30;
+        top: calc(env(safe-area-inset-top, 0px) + 32px);
+        width: clamp(44px, 7.6vmin, 58px);
+        height: clamp(44px, 7.6vmin, 58px);
+        border-radius: 50%;
+        border: 3px solid #fff;
+        background: var(--red);
+        font-size: clamp(22px, 4.2vmin, 32px);
+        cursor: pointer;
+        color: #fff;
+        font-family: var(--font);
+        font-weight: 700;
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .round:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+      }
+      #back {
+        left: calc(env(safe-area-inset-left, 0px) + 12px);
+      }
+      #mute {
+        right: calc(env(safe-area-inset-right, 0px) + 12px);
+      }
+      #mute.off {
+        background: #5d7078;
+      }
+
+      /* ---------- screens ---------- */
+      .screen {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--top) calc(env(safe-area-inset-right, 0px) + 14px)
+          calc(env(safe-area-inset-bottom, 0px) + 12px)
+          calc(env(safe-area-inset-left, 0px) + 14px);
+        gap: 3vmin;
+        text-align: center;
+      }
+      .screen.active {
+        display: flex;
+      }
+      h1 {
+        font-family: var(--title);
+        font-size: clamp(36px, 9.5vmin, 76px);
+        line-height: 1.05;
+        color: #fff;
+        font-weight: 700;
+        text-shadow:
+          0 4px 0 var(--red),
+          0 0 26px rgba(255, 207, 74, 0.55);
+      }
+      .sub {
+        font-size: clamp(15px, 3.2vmin, 26px);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #5a1a00;
+        background: var(--gold);
+        padding: 0.1em 0.9em;
+        border-radius: 40px;
+        box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+      }
+
+      .choices {
+        display: flex;
+        gap: clamp(12px, 3vmin, 28px);
+        flex-wrap: wrap;
+        justify-content: center;
+        width: min(94vw, 900px);
+      }
+      .big {
+        font-family: var(--font);
+        color: #fff;
+        cursor: pointer;
+        border: 4px solid rgba(255, 255, 255, 0.9);
+        border-radius: clamp(18px, 3.6vmin, 30px);
+        padding: clamp(12px, 2.4vmin, 24px) clamp(18px, 4vmin, 40px);
+        min-width: clamp(150px, 30vmin, 260px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6vmin;
+        box-shadow:
+          0 8px 0 rgba(0, 0, 0, 0.35),
+          0 14px 26px rgba(0, 0, 0, 0.3);
+        transition:
+          transform 0.12s,
+          box-shadow 0.12s;
+      }
+      .big:active {
+        transform: translateY(6px);
+        box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+      }
+      .big b {
+        font-size: clamp(24px, 5.2vmin, 44px);
+        font-weight: 700;
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+      }
+      .big small {
+        font-size: clamp(13px, 2.6vmin, 21px);
+        font-weight: 500;
+        opacity: 0.95;
+      }
+      .big .pics {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .big .pics img {
+        height: clamp(34px, 8vmin, 64px);
+        width: auto;
+        filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
+      }
+      .easy {
+        background: linear-gradient(160deg, #38c172, #14753a);
+      }
+      .hard {
+        background: linear-gradient(160deg, #ff5a6e, #b81830);
+      }
+      .blue {
+        background: linear-gradient(160deg, #5bc0f8, #1b73c4);
+      }
+      .alt {
+        background: linear-gradient(160deg, #ffc83d, #e08a00);
+      }
+
+      /* ---------- game ---------- */
+      #game {
+        justify-content: flex-start;
+        gap: 1.2vmin;
+        padding-top: calc(var(--top) - 14px);
+      }
+      #hud {
+        display: flex;
+        gap: clamp(8px, 2.4vmin, 26px);
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        font-size: clamp(15px, 3.2vmin, 26px);
+        font-weight: 700;
+        color: var(--gold);
+        flex: none;
+      }
+      #hud span {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 30px;
+        padding: 3px 16px;
+        white-space: nowrap;
+      }
+      #prog {
+        flex: none;
+        width: min(80vw, 520px);
+        height: clamp(10px, 1.8vmin, 16px);
+        border-radius: 20px;
+        border: 2px solid #fff;
+        background: rgba(255, 255, 255, 0.15);
+        overflow: hidden;
+      }
+      #progFill {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: repeating-linear-gradient(
+          -45deg,
+          var(--red) 0 8px,
+          #fff 8px 16px
+        );
+        transition: width 0.4s;
+      }
+      #play {
+        flex: 1;
+        min-height: 0;
+        width: min(96vw, 1000px);
+        display: flex;
+        flex-direction: column;
+        gap: 1.6vmin;
+      }
+
+      #prompt {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        flex: none;
+      }
+      #say {
+        width: clamp(52px, 10vmin, 76px);
+        height: clamp(52px, 10vmin, 76px);
+        border-radius: 50%;
+        border: 4px solid #fff;
+        cursor: pointer;
+        background: linear-gradient(160deg, #38c172, #14753a);
+        font-size: clamp(24px, 5vmin, 38px);
+        box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #say:active {
+        transform: translateY(4px);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+      }
+      #say.talk {
+        animation: pulse 0.6s ease-in-out 2;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.15);
+        }
+      }
+      #wordText {
+        font-size: clamp(30px, 8vmin, 64px);
+        font-weight: 700;
+        background: var(--cream);
+        color: #0f4a2c;
+        border-radius: 24px;
+        padding: 0.05em 0.6em;
+        border: 4px solid #fff;
+        box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+        line-height: 1.2;
+      }
+
+      #opts {
+        flex: 1;
+        min-height: 0;
+        display: grid;
+        gap: clamp(10px, 2.4vmin, 22px);
+        grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+        grid-template-rows: repeat(var(--rows), minmax(0, 1fr));
+      }
+      #opts.easy {
+        --cols: 2;
+        --rows: 1;
+      }
+      #opts.hard {
+        --cols: 2;
+        --rows: 2;
+      }
+      @media (orientation: landscape) {
+        #opts.hard {
+          --cols: 4;
+          --rows: 1;
+        }
+      }
+      /* each picture sits on a little gift tag with a candy-cane top edge */
+      .opt {
+        min-width: 0;
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        background: var(--cream);
+        border: 5px solid #fff;
+        border-top: 12px solid transparent;
+        border-radius: clamp(14px, 3vmin, 26px);
+        background-image:
+          linear-gradient(var(--cream), var(--cream)),
+          repeating-linear-gradient(45deg, var(--red) 0 10px, #fff 10px 20px);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        padding: 6px;
+        box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+        font-family: var(--font);
+        color: #0f4a2c;
+        font-weight: 700;
+        font-size: clamp(16px, 3.4vmin, 28px);
+        transition: transform 0.12s;
+        animation: pop 0.35s backwards;
+      }
+      .opt:active {
+        transform: translateY(4px);
+      }
+      .opt img {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        pointer-events: none;
+      }
+      @keyframes pop {
+        0% {
+          transform: scale(0.7);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .opt.right {
+        background-image:
+          linear-gradient(#e8ffe8, #e8ffe8),
+          linear-gradient(var(--green), var(--green));
+        box-shadow: 0 0 18px 6px rgba(56, 193, 114, 0.85);
+        animation: bounce 0.5s;
+      }
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.07);
+        }
+      }
+      .opt.wrong {
+        background-image:
+          linear-gradient(#ffe3e3, #ffe3e3), linear-gradient(#e8384f, #e8384f);
+        opacity: 0.55;
+        animation: shake 0.4s;
+        cursor: default;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-10px);
+        }
+        75% {
+          transform: translateX(10px);
+        }
+      }
+      /* little sparkles when the right picture is tapped */
+      .spark {
+        position: fixed;
+        z-index: 40;
+        pointer-events: none;
+        font-size: clamp(18px, 4vmin, 30px);
+        animation: spark 0.9s ease-out forwards;
+      }
+      @keyframes spark {
+        0% {
+          transform: translate(-50%, -50%) scale(0.5);
+          opacity: 1;
+        }
+        100% {
+          transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)))
+            scale(1.2);
+          opacity: 0;
+        }
+      }
+
+      @media (orientation: landscape) and (max-height: 500px) {
+        .screen {
+          gap: 1.6vh;
+        }
+        h1 {
+          font-size: clamp(26px, 11vh, 54px);
+        }
+        .sub {
+          font-size: clamp(13px, 5vh, 22px);
+        }
+        #wordText {
+          font-size: clamp(24px, 9vh, 44px);
+        }
+      }
+
+      /* ---------- results ---------- */
+      #result {
+        justify-content: flex-start;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 2vmin;
+        padding-bottom: 30px;
+      }
+      #result h1 {
+        margin-top: auto;
+      }
+      .stars {
+        font-size: clamp(34px, 8vmin, 64px);
+        letter-spacing: 6px;
+      }
+      .stats {
+        display: flex;
+        gap: clamp(10px, 3vmin, 30px);
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .stat {
+        background: rgba(0, 0, 0, 0.32);
+        border-radius: 24px;
+        padding: clamp(8px, 1.6vmin, 16px) clamp(24px, 5vmin, 48px);
+        min-width: clamp(120px, 26vmin, 220px);
+      }
+      .stat small {
+        display: block;
+        font-size: clamp(13px, 2.6vmin, 20px);
+        color: var(--gold);
+        font-weight: 500;
+      }
+      .stat b {
+        font-size: clamp(28px, 7vmin, 56px);
+        font-weight: 700;
+      }
+      #missTitle {
+        font-size: clamp(18px, 4vmin, 30px);
+        color: var(--gold);
+        font-weight: 700;
+      }
+      #missList {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fill,
+          minmax(clamp(110px, 22vmin, 170px), 1fr)
+        );
+        gap: 12px;
+        width: min(96vw, 900px);
+      }
+      .missCard {
+        background: var(--cream);
+        border-radius: 20px;
+        border: 3px solid var(--gold);
+        padding: 8px 6px 10px;
+        color: #0f4a2c;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+      .missCard img {
+        width: 70%;
+        height: clamp(54px, 12vmin, 100px);
+        object-fit: contain;
+      }
+      .missCard .w {
+        font-size: clamp(16px, 3.2vmin, 24px);
+        font-weight: 700;
+      }
+      #perfect {
+        font-size: clamp(20px, 4.6vmin, 34px);
+        color: #4ade80;
+        font-weight: 700;
+      }
+      #result .choices {
+        margin-top: 1vmin;
+        margin-bottom: auto;
+      }
+      #result .choices .big {
+        min-width: clamp(130px, 24vmin, 210px);
+        padding: clamp(10px, 2vmin, 18px) clamp(14px, 3vmin, 30px);
+      }
+      .fall {
+        position: absolute;
+        top: -60px;
+        font-size: clamp(24px, 5vmin, 44px);
+        animation: confall linear forwards;
+        pointer-events: none;
+        z-index: 5;
+      }
+      @keyframes confall {
+        to {
+          transform: translateY(115vh) rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="lights"></div>
+    <div id="sky"></div>
+
+    <button id="back" class="round" aria-label="Back">&#8592;</button>
+    <button
+      id="mute"
+      class="round"
+      aria-label="Mute music"
+      title="Music on/off"
+    >
+      🔊
+    </button>
+
+    <!-- screen 1: mode -->
+    <section id="modeScreen" class="screen active">
+      <h1>Word up!</h1>
+      <div class="sub">Listen, then pick the right picture</div>
+      <div class="choices">
+        <button class="big easy" id="btnEasy">
+          <div class="pics">
+            <img src="images/santa.png" alt="" /><img
+              src="images/snowman.png"
+              alt=""
+            />
+          </div>
+          <b>Easy</b><small>2 pictures</small>
+        </button>
+        <button class="big hard" id="btnHard">
+          <div class="pics">
+            <img src="images/reindeer.png" alt="" /><img
+              src="images/bell.png"
+              alt=""
+            /><img src="images/star.png" alt="" /><img
+              src="images/stocking.png"
+              alt=""
+            />
+          </div>
+          <b>Difficult</b><small>4 pictures</small>
+        </button>
+      </div>
+    </section>
+
+    <!-- screen 2: game -->
+    <section id="game" class="screen">
+      <div id="hud">
+        <span id="hudWord">Word 1/18</span><span id="hudScore">⭐ 0</span
+        ><span id="hudTime">⏱ 0:00</span>
+      </div>
+      <div id="prog"><i id="progFill"></i></div>
+      <div id="play">
+        <div id="prompt">
+          <button id="say" aria-label="Say the word again">🗣️</button>
+          <div id="wordText">word</div>
+        </div>
+        <div id="opts" class="easy"></div>
+      </div>
+    </section>
+
+    <!-- screen 3: results -->
+    <section id="result" class="screen">
+      <h1 id="resTitle">Great job!</h1>
+      <div class="stars" id="resStars"></div>
+      <div class="stats">
+        <div class="stat"><small>Score</small><b id="resScore">0/18</b></div>
+        <div class="stat"><small>Time</small><b id="resTime">0:00</b></div>
+      </div>
+      <div id="missTitle"></div>
+      <div id="perfect" style="display: none">
+        Every word right first time! 🎄
+      </div>
+      <div id="missList"></div>
+      <div class="choices">
+        <button class="big alt" id="btnAgain"><b>Play again</b></button>
+        <button class="big blue" id="btnModes"><b>Modes</b></button>
+      </div>
+    </section>
+
+    <script>
+      /* ===== settings ===== */
+      var MUSIC_VOLUME = 0.1; // background music level (0 to 1)
+      var SFX_VOLUME = 0.25; // jingle level
+      var TEMPO_BPM = 120;
+      var VOICE_RATE = 0.8; // speaking speed (lower = slower)
+      var NEXT_DELAY = 1300; // pause after a correct answer (ms)
+      var IMG_FOLDER = "images/";
+
+      /* word shown and spoken, image file inside the images folder */
+      var ITEMS = [
+        ["Santa", "santa.png"],
+        ["reindeer", "reindeer.png"],
+        ["sleigh", "sleigh.png"],
+        ["elf", "elf.png"],
+        ["snowman", "snowman.png"],
+        ["snowflake", "snowflake.png"],
+        ["Christmas tree", "tree.png"],
+        ["star", "star.png"],
+        ["decoration", "decoration.png"],
+        ["present", "present.png"],
+        ["wrapping paper", "wrapping-paper.png"],
+        ["toys", "toys.png"],
+        ["stocking", "stocking.png"],
+        ["candy cane", "candy-cane.png"],
+        ["candle", "candle.png"],
+        ["bell", "bell.png"],
+        ["wreath", "wreath.png"],
+        ["Christmas card", "christmas-card.png"],
+      ];
+
+      /* ===== twinkling string lights ===== */
+      var LIGHT_COLORS = [
+        "#ff4d5e",
+        "#ffd54a",
+        "#4ade80",
+        "#5bc0f8",
+        "#ff9ad5",
+      ];
+      function buildLights() {
+        var box = document.getElementById("lights");
+        box.innerHTML = "";
+        var inset = parseFloat(getComputedStyle(box).height) - 30 || 0;
+        var gap = 32;
+        var n = Math.ceil(window.innerWidth / gap) + 1;
+        for (var i = 0; i < n; i++) {
+          var b = document.createElement("div");
+          b.className = "bulb";
+          var sag = Math.sin((Math.PI * (i % 6)) / 6) * 8;
+          b.style.left = i * gap + 4 + "px";
+          b.style.top = inset + 5 + sag + "px";
+          b.style.setProperty("--c", LIGHT_COLORS[i % LIGHT_COLORS.length]);
+          b.style.animationDelay = -((i * 0.37) % 1.8) + "s";
+          box.appendChild(b);
+        }
+      }
+      buildLights();
+      window.addEventListener("resize", buildLights);
+
+      /* ===== snowfall ===== */
+      (function () {
+        var sky = document.getElementById("sky");
+        for (var i = 0; i < 40; i++) {
+          var f = document.createElement("div");
+          f.className = "flake";
+          var s = 3 + Math.random() * 6;
+          f.style.width = s + "px";
+          f.style.height = s + "px";
+          f.style.left = Math.random() * 100 + "vw";
+          f.style.opacity = 0.4 + Math.random() * 0.5;
+          f.style.animationDuration = 8 + Math.random() * 9 + "s";
+          f.style.animationDelay = -Math.random() * 16 + "s";
+          f.style.setProperty("--dx", Math.random() * 16 - 8 + "vw");
+          sky.appendChild(f);
+        }
+      })();
+
+      /* ===== mute state (shared with the other pages) ===== */
+      var muted = false;
+      try {
+        muted = localStorage.getItem("christmasMuted") === "1";
+      } catch (e) {}
+      var muteBtn = document.getElementById("mute");
+      function showMute() {
+        muteBtn.textContent = muted ? "🔇" : "🔊";
+        muteBtn.classList.toggle("off", muted);
+        muteBtn.setAttribute(
+          "aria-label",
+          muted ? "Unmute music" : "Mute music",
+        );
+      }
+      showMute();
+
+      /* ===== music: a bouncy "elf polka" in D major (original) ===== */
+      var ctx = null,
+        master = null,
+        sfxGain = null,
+        timer = null,
+        started = false;
+      var events = [],
+        evIndex = 0,
+        loopStart = 0,
+        beat = 60 / TEMPO_BPM,
+        LOOP_BEATS = 32;
+      function hz(m) {
+        return 440 * Math.pow(2, (m - 69) / 12);
+      }
+
+      (function buildSong() {
+        // D G A D | D Bm A D, "oom-pah" bass and chords
+        var roots = [50, 43, 45, 50, 50, 47, 45, 50];
+        var fifths = [57, 50, 52, 57, 57, 54, 52, 57];
+        var chords = [
+          [62, 66, 69],
+          [62, 67, 71],
+          [61, 64, 69],
+          [62, 66, 69],
+          [62, 66, 69],
+          [62, 66, 71],
+          [61, 64, 69],
+          [62, 66, 69],
+        ];
+        for (var b = 0; b < 8; b++) {
+          var t = b * 4;
+          events.push({ t: t, m: [roots[b]], d: 0.7, v: 0.6, w: "sine" });
+          events.push({ t: t + 2, m: [fifths[b]], d: 0.7, v: 0.5, w: "sine" });
+          events.push({
+            t: t + 1,
+            m: chords[b],
+            d: 0.3,
+            v: 0.14,
+            w: "triangle",
+          });
+          events.push({
+            t: t + 3,
+            m: chords[b],
+            d: 0.3,
+            v: 0.14,
+            w: "triangle",
+          });
+        }
+        var mel = [
+          [0, 74, 0.5],
+          [0.5, 78, 0.5],
+          [1, 81, 1],
+          [2, 78, 0.5],
+          [2.5, 74, 0.5],
+          [3, 78, 1],
+          [4, 79, 0.5],
+          [4.5, 83, 0.5],
+          [5, 86, 1],
+          [6, 83, 1],
+          [7, 79, 1],
+          [8, 81, 0.5],
+          [8.5, 85, 0.5],
+          [9, 88, 1],
+          [10, 85, 0.5],
+          [10.5, 81, 0.5],
+          [11, 85, 1],
+          [12, 86, 1],
+          [13, 81, 1],
+          [14, 78, 2],
+          [16, 74, 0.5],
+          [16.5, 78, 0.5],
+          [17, 81, 1],
+          [18, 86, 1],
+          [19, 81, 1],
+          [20, 83, 0.5],
+          [20.5, 86, 0.5],
+          [21, 90, 1],
+          [22, 86, 0.5],
+          [22.5, 83, 0.5],
+          [23, 78, 1],
+          [24, 81, 1],
+          [25, 85, 0.5],
+          [25.5, 81, 0.5],
+          [26, 76, 1],
+          [27, 81, 1],
+          [28, 78, 1],
+          [29, 81, 1],
+          [30, 86, 2],
+        ];
+        mel.forEach(function (n) {
+          events.push({
+            t: n[0],
+            m: [n[1]],
+            d: n[2] * 0.9,
+            v: 0.38,
+            w: "triangle",
+            pluck: true,
+            bell: true,
+          });
+        });
+        events.sort(function (a, b) {
+          return a.t - b.t;
+        });
+      })();
+
+      function playNote(freq, when, durBeats, vol, wave, pluck, bell) {
+        var dur = durBeats * beat;
+        var o = ctx.createOscillator(),
+          g = ctx.createGain();
+        o.type = wave;
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, when);
+        g.gain.linearRampToValueAtTime(vol, when + 0.012);
+        g.gain.exponentialRampToValueAtTime(
+          0.0001,
+          when + dur + (pluck ? 0.18 : 0.25),
+        );
+        o.connect(g);
+        g.connect(master);
+        o.start(when);
+        o.stop(when + dur + 0.4);
+        if (bell) {
+          var o2 = ctx.createOscillator(),
+            g2 = ctx.createGain();
+          o2.type = "sine";
+          o2.frequency.value = freq * 2;
+          g2.gain.setValueAtTime(0.0001, when);
+          g2.gain.linearRampToValueAtTime(vol * 0.25, when + 0.01);
+          g2.gain.exponentialRampToValueAtTime(0.0001, when + dur * 0.6 + 0.2);
+          o2.connect(g2);
+          g2.connect(master);
+          o2.start(when);
+          o2.stop(when + dur + 0.3);
+        }
+      }
+      function schedule() {
+        if (!ctx) return;
+        while (true) {
+          var e = events[evIndex];
+          var when = loopStart + e.t * beat;
+          if (when > ctx.currentTime + 0.5) break;
+          if (when >= ctx.currentTime - 0.05) {
+            for (var i = 0; i < e.m.length; i++)
+              playNote(hz(e.m[i]), when, e.d, e.v, e.w, e.pluck, e.bell);
+          }
+          evIndex++;
+          if (evIndex >= events.length) {
+            evIndex = 0;
+            loopStart += LOOP_BEATS * beat;
+          }
+        }
+      }
+      function startMusic() {
+        if (started) {
+          if (ctx && ctx.state === "suspended") ctx.resume();
+          return;
+        }
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        ctx = new AC();
+        master = ctx.createGain();
+        master.gain.value = muted ? 0 : MUSIC_VOLUME;
+        master.connect(ctx.destination);
+        sfxGain = ctx.createGain();
+        sfxGain.gain.value = muted ? 0 : SFX_VOLUME;
+        sfxGain.connect(ctx.destination);
+        loopStart = ctx.currentTime + 0.2;
+        evIndex = 0;
+        timer = setInterval(schedule, 100);
+        started = true;
+        if (ctx.state === "suspended") ctx.resume();
+      }
+      /* music starts on the first tap (browsers need a tap) */
+      function firstTap() {
+        document.removeEventListener("click", firstTap, true);
+        document.removeEventListener("touchend", firstTap, true);
+        if (!muted) startMusic();
+      }
+      document.addEventListener("click", firstTap, true);
+      document.addEventListener("touchend", firstTap, true);
+
+      muteBtn.addEventListener("click", function () {
+        muted = !muted;
+        try {
+          localStorage.setItem("christmasMuted", muted ? "1" : "0");
+        } catch (e) {}
+        showMute();
+        if (!muted && !started) startMusic();
+        if (ctx) {
+          master.gain.setTargetAtTime(
+            muted ? 0 : MUSIC_VOLUME,
+            ctx.currentTime,
+            0.05,
+          );
+          sfxGain.gain.setTargetAtTime(
+            muted ? 0 : SFX_VOLUME,
+            ctx.currentTime,
+            0.05,
+          );
+        }
+      });
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden && window.speechSynthesis) speechSynthesis.cancel();
+        if (!ctx) return;
+        if (document.hidden) ctx.suspend();
+        else ctx.resume();
+      });
+
+      /* one sound: freq, delay, length, wave, volume, optional glide-to freq */
+      function blip(freq, delay, dur, type, vol, glideTo) {
+        if (!ctx || muted) return;
+        var t = ctx.currentTime + (delay || 0);
+        var o = ctx.createOscillator(),
+          g = ctx.createGain();
+        o.type = type || "sine";
+        o.frequency.setValueAtTime(freq, t);
+        if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t + dur);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(vol || 1, t + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g);
+        g.connect(sfxGain);
+        o.start(t);
+        o.stop(t + dur + 0.05);
+      }
+      /* right: sleigh-bell chime that sparkles upward */
+      function jingleRight() {
+        [784, 988, 1175, 1568].forEach(function (f, i) {
+          blip(f, i * 0.08, 0.28, "triangle", 1);
+        });
+        blip(2349, 0.34, 0.5, "sine", 0.3);
+        blip(1568, 0.34, 0.5, "triangle", 0.6);
+      }
+      /* wrong: a soft "oh no" that slides down */
+      function jingleWrong() {
+        blip(440, 0, 0.45, "triangle", 0.9, 180);
+        blip(330, 0.4, 0.6, "triangle", 0.9, 110);
+        blip(70, 0.4, 0.5, "sine", 0.7, 50);
+      }
+      function jingleWin() {
+        [523, 659, 784, 1047, 784, 1047, 1319].forEach(function (f, i) {
+          blip(f, i * 0.14, 0.3, "triangle", 1);
+        });
+      }
+
+      /* ===== voice (the device's built-in speech) ===== */
+      var voice = null;
+      function pickVoice() {
+        if (!window.speechSynthesis) return;
+        var vs = speechSynthesis.getVoices(),
+          pick = null;
+        for (var i = 0; i < vs.length; i++) {
+          if (vs[i].lang && vs[i].lang.replace("_", "-") === "en-US") {
+            pick = vs[i];
+            break;
+          }
+          if (
+            !pick &&
+            vs[i].lang &&
+            vs[i].lang.toLowerCase().indexOf("en") === 0
+          )
+            pick = vs[i];
+        }
+        voice = pick;
+      }
+      if (window.speechSynthesis) {
+        pickVoice();
+        speechSynthesis.onvoiceschanged = pickVoice;
+      }
+      function speak(word, delay) {
+        if (!window.speechSynthesis) return;
+        var go = function () {
+          if (current !== "game") return;
+          try {
+            speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(word);
+            u.lang = "en-US";
+            if (voice) u.voice = voice;
+            u.rate = VOICE_RATE;
+            u.pitch = 1.05;
+            u.volume = 1;
+            speechSynthesis.speak(u);
+          } catch (e) {}
+        };
+        if (delay) setTimeout(go, delay);
+        else go();
+      }
+
+      /* ===== screens ===== */
+      var $ = function (id) {
+        return document.getElementById(id);
+      };
+      var screens = { mode: "modeScreen", game: "game", result: "result" };
+      var current = "mode";
+      function show(name) {
+        current = name;
+        for (var k in screens)
+          $(screens[k]).classList.toggle("active", k === name);
+        if (name !== "game") stopClock();
+        if (name !== "game" && window.speechSynthesis) speechSynthesis.cancel();
+        if (name !== "result") clearConfetti();
+      }
+      $("back").addEventListener("click", function () {
+        if (current === "mode") location.href = "index.html";
+        else show("mode");
+      });
+      $("btnEasy").addEventListener("click", function () {
+        startGame("easy");
+      });
+      $("btnHard").addEventListener("click", function () {
+        startGame("hard");
+      });
+      $("btnAgain").addEventListener("click", function () {
+        startGame(mode);
+      });
+      $("btnModes").addEventListener("click", function () {
+        show("mode");
+      });
+      $("say").addEventListener("click", function () {
+        if (target) speak(target[0], 0);
+        var b = $("say");
+        b.classList.remove("talk");
+        void b.offsetWidth;
+        b.classList.add("talk");
+      });
+
+      /* ===== game ===== */
+      var mode = "easy",
+        order = [],
+        idx = 0,
+        score = 0,
+        missed = [],
+        target = null,
+        lock = false,
+        triedWrong = false;
+
+      function shuffle(a) {
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i];
+          a[i] = a[j];
+          a[j] = t;
+        }
+        return a;
+      }
+
+      /* ===== timer ===== */
+      /* the short pause after each right answer is not counted */
+      var t0 = 0,
+        clock = null,
+        pausedMs = 0,
+        pauseStart = 0;
+      function fmt(ms) {
+        var s = Math.floor(ms / 1000),
+          m = Math.floor(s / 60);
+        s = s % 60;
+        return m + ":" + (s < 10 ? "0" : "") + s;
+      }
+      function elapsed() {
+        var now = Date.now();
+        return now - t0 - pausedMs - (pauseStart ? now - pauseStart : 0);
+      }
+      function endPause() {
+        if (pauseStart) {
+          pausedMs += Date.now() - pauseStart;
+          pauseStart = 0;
+        }
+      }
+      function tick() {
+        $("hudTime").textContent = "⏱ " + fmt(elapsed());
+      }
+      function stopClock() {
+        if (clock) {
+          clearInterval(clock);
+          clock = null;
+        }
+      }
+
+      function startGame(m) {
+        mode = m;
+        order = shuffle(ITEMS.slice()); // all 18 words, every game
+        idx = 0;
+        score = 0;
+        missed = [];
+        show("game");
+        t0 = Date.now();
+        pausedMs = 0;
+        pauseStart = 0;
+        tick();
+        stopClock();
+        clock = setInterval(tick, 500);
+        showQuestion(true);
+      }
+
+      function showQuestion(first) {
+        endPause();
+        target = order[idx];
+        lock = false;
+        triedWrong = false;
+        var n = mode === "easy" ? 2 : 4;
+        var others = shuffle(
+          ITEMS.filter(function (it) {
+            return it !== target;
+          }),
+        ).slice(0, n - 1);
+        var opts = shuffle([target].concat(others));
+
+        $("hudWord").textContent = "Word " + (idx + 1) + "/" + order.length;
+        $("hudScore").textContent = "⭐ " + score;
+        $("progFill").style.width = (idx / order.length) * 100 + "%";
+        $("wordText").textContent = target[0];
+
+        var box = $("opts");
+        box.className = mode;
+        box.innerHTML = "";
+        opts.forEach(function (it, i) {
+          var b = document.createElement("button");
+          b.className = "opt";
+          b.style.animationDelay = i * 0.06 + "s";
+          b.setAttribute("aria-label", "picture");
+          var im = document.createElement("img");
+          im.alt = "";
+          im.onerror = function () {
+            b.textContent = it[0];
+          }; // if an image is missing, show its word
+          im.src = IMG_FOLDER + it[1];
+          b.appendChild(im);
+          b.addEventListener("click", function () {
+            choose(it, b);
+          });
+          box.appendChild(b);
+        });
+        /* the first word is spoken straight away (it follows a tap, which phones need) */
+        speak(target[0], first ? 0 : 300);
+        var s = $("say");
+        s.classList.remove("talk");
+        void s.offsetWidth;
+        s.classList.add("talk");
+      }
+
+      /* a few sparkles fly out of the button */
+      function sparkle(btn) {
+        var r = btn.getBoundingClientRect(),
+          cx = r.left + r.width / 2,
+          cy = r.top + r.height / 2,
+          em = ["✨", "❄️", "⭐", "🎁", "🔔"];
+        for (var i = 0; i < 8; i++) {
+          var s = document.createElement("div");
+          s.className = "spark";
+          s.textContent = em[i % em.length];
+          var a = (Math.PI * 2 * i) / 8,
+            d = 60 + Math.random() * 50;
+          s.style.left = cx + "px";
+          s.style.top = cy + "px";
+          s.style.setProperty("--dx", Math.cos(a) * d + "px");
+          s.style.setProperty("--dy", Math.sin(a) * d + "px");
+          document.body.appendChild(s);
+          setTimeout(
+            (function (el) {
+              return function () {
+                el.remove();
+              };
+            })(s),
+            950,
+          );
+        }
+      }
+
+      function choose(it, btn) {
+        if (lock || btn.classList.contains("wrong")) return;
+        if (it === target) {
+          lock = true;
+          pauseStart = Date.now();
+          btn.classList.add("right");
+          sparkle(btn);
+          if (!triedWrong) score++;
+          $("hudScore").textContent = "⭐ " + score;
+          jingleRight();
+          setTimeout(function () {
+            idx++;
+            if (idx >= order.length) finish();
+            else showQuestion(false);
+          }, NEXT_DELAY);
+        } else {
+          btn.classList.add("wrong");
+          if (!triedWrong) {
+            triedWrong = true;
+            missed.push(target);
+          }
+          jingleWrong();
+          speak(target[0], 900); // say the word again so they can try once more
+        }
+      }
+
+      /* ===== results ===== */
+      function finish() {
+        endPause();
+        stopClock();
+        var total = order.length,
+          pct = score / total;
+        $("resScore").textContent = score + "/" + total;
+        $("resTime").textContent = fmt(elapsed());
+        $("resTitle").textContent =
+          pct === 1 ? "Perfect!" : pct >= 0.6 ? "Great job!" : "Good try!";
+        var stars = pct >= 0.9 ? 3 : pct >= 0.6 ? 2 : 1,
+          s = "";
+        for (var i = 0; i < 3; i++) s += i < stars ? "⭐" : "☆";
+        $("resStars").textContent = s;
+
+        var list = $("missList");
+        list.innerHTML = "";
+        if (missed.length) {
+          $("missTitle").textContent = "Words to practise:";
+          $("perfect").style.display = "none";
+          missed.forEach(function (w) {
+            var c = document.createElement("div");
+            c.className = "missCard";
+            var im = document.createElement("img");
+            im.alt = "";
+            im.src = IMG_FOLDER + w[1];
+            im.onerror = function () {
+              im.style.visibility = "hidden";
+            };
+            var t = document.createElement("div");
+            t.className = "w";
+            t.textContent = w[0];
+            c.appendChild(im);
+            c.appendChild(t);
+            list.appendChild(c);
+          });
+        } else {
+          $("missTitle").textContent = "";
+          $("perfect").style.display = "block";
+        }
+        show("result");
+        $("result").scrollTop = 0;
+        jingleWin();
+        confetti();
+      }
+      function confetti() {
+        var box = $("result"),
+          em = ["🎄", "⭐", "🎁", "❄️", "🔔", "🍬"];
+        for (var i = 0; i < 24; i++) {
+          var s = document.createElement("div");
+          s.className = "fall";
+          s.textContent = em[i % em.length];
+          s.style.left = Math.random() * 100 + "%";
+          s.style.animationDuration = 3 + Math.random() * 3 + "s";
+          s.style.animationDelay = Math.random() * 2 + "s";
+          box.appendChild(s);
+        }
+      }
+      function clearConfetti() {
+        Array.prototype.forEach.call(
+          document.querySelectorAll(".fall"),
+          function (n) {
+            n.remove();
+          },
+        );
+      }
+
+      /* preload images quietly */
+      ITEMS.forEach(function (it) {
+        var im = new Image();
+        im.src = IMG_FOLDER + it[1];
+      });
+    </script>
+  </body>
+</html>
