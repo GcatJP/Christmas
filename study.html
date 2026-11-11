@@ -1073,9 +1073,7 @@
 
     <script>
       /* ===== settings ===== */
-      var MUSIC_VOLUME = 0.1; // background music level (0 to 1)
       var SFX_VOLUME = 0.25; // jingle level
-      var TEMPO_BPM = 150; // speed of the song (beats here are eighth notes)
       var VOICE_RATE = 0.8; // speaking speed (lower = slower)
       var QUIZ_COUNT = 3; // number of quizzes
       var QUIZ_QUESTIONS = 8; // questions per quiz
@@ -1304,175 +1302,17 @@
       }
       showMute();
 
-      /* ===== music: a gentle music box "Silent Night" (public domain) ===== */
+      /* ===== sound effects (no background music on this page) ===== */
       var ctx = null,
-        master = null,
         sfxGain = null,
-        timer = null,
         started = false;
-      var events = [],
-        evIndex = 0,
-        loopStart = 0,
-        beat = 60 / TEMPO_BPM,
-        LOOP_BEATS = 120; // 20 bars of 6 eighth notes
-      function hz(m) {
-        return 440 * Math.pow(2, (m - 69) / 12);
-      }
 
-      (function buildSong() {
-        // melody notes (MIDI)
-        var f = 77,
-          g = 79,
-          a = 81,
-          e = 76,
-          d = 74,
-          c = 72,
-          b = 83,
-          cH = 84,
-          dH = 86,
-          eH = 88,
-          fH = 89;
-        var mel = [
-          [g, 3],
-          [a, 1],
-          [g, 2],
-          [e, 6],
-          [g, 3],
-          [a, 1],
-          [g, 2],
-          [e, 6],
-          [dH, 4],
-          [dH, 2],
-          [b, 6],
-          [cH, 4],
-          [cH, 2],
-          [g, 6],
-          [a, 4],
-          [a, 2],
-          [cH, 3],
-          [b, 1],
-          [a, 2],
-          [g, 3],
-          [a, 1],
-          [g, 2],
-          [e, 6],
-          [a, 4],
-          [a, 2],
-          [cH, 3],
-          [b, 1],
-          [a, 2],
-          [g, 3],
-          [a, 1],
-          [g, 2],
-          [e, 6],
-          [dH, 2],
-          [dH, 1],
-          [fH, 1],
-          [dH, 1],
-          [b, 1],
-          [cH, 1],
-          [eH, 1],
-          [cH, 1],
-          [g, 1],
-          [e, 1],
-          [g, 1],
-          [f, 3],
-          [d, 3],
-          [c, 6],
-        ];
-        var t = 0;
-        mel.forEach(function (n) {
-          events.push({
-            t: t,
-            m: [n[0]],
-            d: n[1] * 0.9,
-            v: 0.36,
-            w: "triangle",
-            pluck: true,
-            bell: true,
-          });
-          t += n[1];
-        });
-        // soft chords: C, F or G for each of the 20 bars
-        var bars = "CCCCGGCCFFCCFFCCGCGC".split("");
-        var CH = {
-          C: { root: 48, tri: [60, 64, 67] },
-          F: { root: 41, tri: [57, 60, 65] },
-          G: { root: 43, tri: [59, 62, 67] },
-        };
-        for (var i = 0; i < 20; i++) {
-          var ch = CH[bars[i]],
-            s = i * 6;
-          events.push({ t: s, m: [ch.root], d: 3, v: 0.5, w: "sine" });
-          [
-            [2, 0],
-            [3, 1],
-            [4, 2],
-            [5, 1],
-          ].forEach(function (p) {
-            events.push({
-              t: s + p[0],
-              m: [ch.tri[p[1]]],
-              d: 0.9,
-              v: 0.13,
-              w: "triangle",
-              pluck: true,
-            });
-          });
-        }
-        events.sort(function (x, y) {
-          return x.t - y.t;
-        });
-      })();
+      /* let iPhone play speech even with the silent switch on */
+      try {
+        if (navigator.audioSession) navigator.audioSession.type = "playback";
+      } catch (e) {}
 
-      function playNote(freq, when, durBeats, vol, wave, pluck, bell) {
-        var dur = durBeats * beat;
-        var o = ctx.createOscillator(),
-          g = ctx.createGain();
-        o.type = wave;
-        o.frequency.value = freq;
-        g.gain.setValueAtTime(0.0001, when);
-        g.gain.linearRampToValueAtTime(vol, when + 0.012);
-        g.gain.exponentialRampToValueAtTime(
-          0.0001,
-          when + dur + (pluck ? 0.25 : 0.3),
-        );
-        o.connect(g);
-        g.connect(master);
-        o.start(when);
-        o.stop(when + dur + 0.6);
-        if (bell) {
-          var o2 = ctx.createOscillator(),
-            g2 = ctx.createGain();
-          o2.type = "sine";
-          o2.frequency.value = freq * 2;
-          g2.gain.setValueAtTime(0.0001, when);
-          g2.gain.linearRampToValueAtTime(vol * 0.25, when + 0.01);
-          g2.gain.exponentialRampToValueAtTime(0.0001, when + dur * 0.6 + 0.3);
-          o2.connect(g2);
-          g2.connect(master);
-          o2.start(when);
-          o2.stop(when + dur + 0.5);
-        }
-      }
-      function schedule() {
-        if (!ctx) return;
-        while (true) {
-          var e = events[evIndex];
-          var when = loopStart + e.t * beat;
-          if (when > ctx.currentTime + 0.5) break;
-          if (when >= ctx.currentTime - 0.05) {
-            for (var i = 0; i < e.m.length; i++)
-              playNote(hz(e.m[i]), when, e.d, e.v, e.w, e.pluck, e.bell);
-          }
-          evIndex++;
-          if (evIndex >= events.length) {
-            evIndex = 0;
-            loopStart += LOOP_BEATS * beat;
-          }
-        }
-      }
-      function startMusic() {
+      function startAudio() {
         if (started) {
           if (ctx && ctx.state === "suspended") ctx.resume();
           return;
@@ -1480,18 +1320,13 @@
         var AC = window.AudioContext || window.webkitAudioContext;
         if (!AC) return;
         ctx = new AC();
-        master = ctx.createGain();
-        master.gain.value = muted ? 0 : MUSIC_VOLUME;
-        master.connect(ctx.destination);
         sfxGain = ctx.createGain();
         sfxGain.gain.value = muted ? 0 : SFX_VOLUME;
         sfxGain.connect(ctx.destination);
-        loopStart = ctx.currentTime + 0.2;
-        evIndex = 0;
         started = true;
         if (ctx.state === "suspended") ctx.resume();
       }
-      /* music starts on the first tap (browsers need a tap) */
+      /* audio and speech are unlocked on the first tap (browsers need a tap) */
       function firstTap() {
         document.removeEventListener("click", firstTap, true);
         document.removeEventListener("touchend", firstTap, true);
@@ -1503,7 +1338,7 @@
             speechSynthesis.speak(u0);
           }
         } catch (e) {}
-        if (!muted) startMusic();
+        if (!muted) startAudio();
       }
       document.addEventListener("click", firstTap, true);
       document.addEventListener("touchend", firstTap, true);
@@ -1515,13 +1350,8 @@
           localStorage.setItem("christmasMuted", muted ? "1" : "0");
         } catch (e) {}
         showMute();
-        if (!muted && !started) startMusic();
+        if (!muted && !started) startAudio();
         if (ctx) {
-          master.gain.setTargetAtTime(
-            muted ? 0 : MUSIC_VOLUME,
-            ctx.currentTime,
-            0.05,
-          );
           sfxGain.gain.setTargetAtTime(
             muted ? 0 : SFX_VOLUME,
             ctx.currentTime,
@@ -1703,7 +1533,7 @@
         } else {
           main.className = "sent";
           setSentence(main, d.s, d.e ? "" : d.w);
-          $("vJp").textContent = d.sj;
+          $("vJp").innerHTML = d.sj;
         }
         $("vPrev").disabled = vi === 0;
         var nx = $("vNext");
@@ -1999,7 +1829,7 @@
           big.textContent =
             it.s.slice(0, k) + "_____" + it.s.slice(k + it.w.length);
           sub.style.display = "block";
-          sub.textContent = it.sj;
+          sub.innerHTML = it.sj;
         }
         var box = $("qOpts");
         box.innerHTML = "";
@@ -2149,14 +1979,14 @@
         var im = new Image();
         im.src = IMG_FOLDER + it.f;
       });
-      /* ===== audio keep-alive ===== */
+
+      /* ===== audio keep-alive (on taps only, never on a timer) ===== */
       function wakeAudio() {
         if (ctx && !muted && !document.hidden && ctx.state !== "running") {
           var p = ctx.resume();
           if (p && p.catch) p.catch(function () {});
         }
       }
-      setInterval(wakeAudio, 1000);
       ["touchend", "click"].forEach(function (ev) {
         document.addEventListener(ev, wakeAudio, true);
       });
