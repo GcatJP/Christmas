@@ -1116,7 +1116,7 @@
           f: "snowman.png",
           jp: "雪だるま",
           s: "We made a snowman.",
-          sj: "わたしたちは 雪だるまを作りました。",
+          sj: "わたしたちは<br/>雪だるまを作りました。",
         },
         {
           w: "snowflake",
@@ -1130,14 +1130,14 @@
           f: "tree.png",
           jp: "クリスマスツリー",
           s: "The Christmas tree is very tall.",
-          sj: "クリスマスツリーは とても高いです。",
+          sj: "クリスマスツリーは<br/>とてもせが高いです。",
         },
         {
           w: "star",
           f: "star.png",
           jp: "星",
           s: "A bright star is on the tree.",
-          sj: "あかるい星が ツリーの上にあります。",
+          sj: "あかるい星が<br/>ツリーの上にあります。",
         },
         {
           w: "decoration",
@@ -1151,7 +1151,7 @@
           f: "present.png",
           jp: "プレゼント",
           s: "I got a big present.",
-          sj: "わたしは大きなプレゼントをもらいました。",
+          sj: "わたしは大きなプレゼントを<br/>もらいました。",
         },
         {
           w: "wrapping paper",
@@ -1186,7 +1186,7 @@
           f: "candle.png",
           jp: "ろうそく",
           s: "I put a candle on the table.",
-          sj: "わたしはテーブルに ろうそくを置きました。",
+          sj: "わたしはテーブルに<br/>ろうそくを置きました。",
         },
         {
           w: "bell",
@@ -1207,7 +1207,7 @@
           f: "christmas-card.png",
           jp: "クリスマスカード",
           s: "I wrote a Christmas card.",
-          sj: "わたしは クリスマスカードをかきました。",
+          sj: "わたしはクリスマスカード<br/>をかきました。",
         },
       ];
       /* useful Christmas phrases (shown with an emoji instead of a picture) */
@@ -1220,7 +1220,7 @@
         {
           e: "🎅",
           s: "Ho, ho, ho!",
-          sj: "ホー、ホー、ホー！（サンタさんの笑い声）",
+          sj: "ホー、ホー、ホー！<br/>（サンタさんの笑い声）",
         },
         {
           e: "🎁",
@@ -2142,6 +2142,20 @@
       ITEMS.forEach(function (it) {
         var im = new Image();
         im.src = IMG_FOLDER + it.f;
+      });
+      /* ===== audio keep-alive ===== */
+      try {
+        if (navigator.audioSession) navigator.audioSession.type = "playback";
+      } catch (e) {}
+      function wakeAudio() {
+        if (ctx && !muted && !document.hidden && ctx.state !== "running") {
+          var p = ctx.resume();
+          if (p && p.catch) p.catch(function () {});
+        }
+      }
+      setInterval(wakeAudio, 1000);
+      ["touchend", "click"].forEach(function (ev) {
+        document.addEventListener(ev, wakeAudio, true);
       });
     </script>
   </body>

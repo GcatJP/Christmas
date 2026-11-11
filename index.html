@@ -1028,6 +1028,20 @@
           loaderEl.style.display = "none";
         }, 700);
       });
+      /* ===== audio keep-alive ===== */
+      try {
+        if (navigator.audioSession) navigator.audioSession.type = "playback";
+      } catch (e) {}
+      function wakeAudio() {
+        if (ctx && !muted && !document.hidden && ctx.state !== "running") {
+          var p = ctx.resume();
+          if (p && p.catch) p.catch(function () {});
+        }
+      }
+      setInterval(wakeAudio, 1000);
+      ["touchend", "click"].forEach(function (ev) {
+        document.addEventListener(ev, wakeAudio, true);
+      });
     </script>
   </body>
 </html>

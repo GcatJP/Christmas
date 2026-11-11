@@ -442,7 +442,7 @@
           ><img src="images/candy-cane.png" alt="" /><b>Coloring</b></a
         >
         <a class="card c-f" id="w5" target="_blank" rel="noopener"
-          ><img src="images/bell.png" alt="" /><b>Flash and Bingo</b></a
+          ><img src="images/bell.png" alt="" /><b>Flashcards</b></a
         >
       </nav>
     </main>
@@ -455,7 +455,7 @@
          w3 = Reading, w4 = Coloring, w5 = Flashcards).
          To use a full web address for one button, just paste the whole URL
          as the file name and it will be used as it is. */
-      var PDF_BASE = "https://adventureislandesl.b-cdn.net/Christmas_PDFs";
+      var PDF_BASE = "https://adventureislandesl.b-cdn.net/Christmas_PDFs/";
       var PDF_FILES = {
         w1: "Christmas_Worksheets_1.pdf",
         w2: "Christmas__Worksheets_2.pdf",
@@ -463,11 +463,14 @@
         w4: "Christmas_Coloring.pdf",
         w5: "Chritsmas_Cards.pdf",
       };
+      /* the "/" between the folder and the file name is added for you,
+         so it does not matter if PDF_BASE ends with one or not */
+      var BASE = PDF_BASE.replace(/\/+$/, "") + "/";
       Object.keys(PDF_FILES).forEach(function (id) {
         var f = PDF_FILES[id];
         document.getElementById(id).href = /^https?:\/\//i.test(f)
           ? f
-          : PDF_BASE + f;
+          : BASE + f;
       });
       /* hide an icon quietly if its image file is missing */
       Array.prototype.forEach.call(
@@ -780,6 +783,20 @@
 
       document.getElementById("back").addEventListener("click", function () {
         location.href = "index.html";
+      });
+      /* ===== audio keep-alive ===== */
+      try {
+        if (navigator.audioSession) navigator.audioSession.type = "playback";
+      } catch (e) {}
+      function wakeAudio() {
+        if (ctx && !muted && !document.hidden && ctx.state !== "running") {
+          var p = ctx.resume();
+          if (p && p.catch) p.catch(function () {});
+        }
+      }
+      setInterval(wakeAudio, 1000);
+      ["touchend", "click"].forEach(function (ev) {
+        document.addEventListener(ev, wakeAudio, true);
       });
     </script>
   </body>
