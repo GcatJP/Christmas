@@ -1488,7 +1488,6 @@
         sfxGain.connect(ctx.destination);
         loopStart = ctx.currentTime + 0.2;
         evIndex = 0;
-        timer = setInterval(schedule, 100);
         started = true;
         if (ctx.state === "suspended") ctx.resume();
       }
@@ -2151,9 +2150,6 @@
         im.src = IMG_FOLDER + it.f;
       });
       /* ===== audio keep-alive ===== */
-      try {
-        if (navigator.audioSession) navigator.audioSession.type = "playback";
-      } catch (e) {}
       function wakeAudio() {
         if (ctx && !muted && !document.hidden && ctx.state !== "running") {
           var p = ctx.resume();
