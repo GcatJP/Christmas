@@ -1,0 +1,1569 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sentence Builder</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="theme-color" content="#0b2f3a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Christmas" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <link rel="apple-touch-icon" href="images/Cicon.jpg" />
+    <link rel="icon" type="image/jpeg" href="images/Cicon.jpg" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Mountains+of+Christmas:wght@700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg1: #07222b;
+        --bg2: #0e4150;
+        --bg3: #1b6b6f;
+        --red: #d7263d;
+        --bad: #ff4d5e;
+        --gold: #ffcf4a;
+        --cream: #fffaf0;
+        --green: #4ade80;
+        --font:
+          "Fredoka", "Chalkboard SE", "Hiragino Maru Gothic ProN",
+          "Comic Sans MS", system-ui, sans-serif;
+        --title:
+          "Mountains of Christmas", "Fredoka", "Hiragino Maru Gothic ProN",
+          cursive, system-ui, sans-serif;
+        --top: calc(env(safe-area-inset-top, 0px) + 88px);
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        margin: 0;
+        padding: 0;
+      }
+      html,
+      body {
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg1);
+        font-family: var(--font);
+        color: var(--cream);
+        -webkit-user-select: none;
+        user-select: none;
+        touch-action: manipulation;
+      }
+      body {
+        background:
+          radial-gradient(
+            ellipse at 15% 0%,
+            rgba(80, 220, 160, 0.28),
+            transparent 45%
+          ),
+          radial-gradient(
+            ellipse at 90% 10%,
+            rgba(215, 38, 61, 0.22),
+            transparent 40%
+          ),
+          linear-gradient(
+            180deg,
+            var(--bg1) 0%,
+            var(--bg2) 60%,
+            var(--bg3) 100%
+          );
+      }
+
+      /* ---------- decorations ---------- */
+      #lights {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: calc(env(safe-area-inset-top, 0px) + 30px);
+        z-index: 3;
+        pointer-events: none;
+      }
+      .bulb {
+        position: absolute;
+        width: 10px;
+        height: 15px;
+        border-radius: 50% 50% 55% 55%;
+        background: var(--c);
+        box-shadow: 0 0 10px 3px var(--c);
+        animation: glow 1.8s infinite ease-in-out;
+      }
+      .bulb::before {
+        content: "";
+        position: absolute;
+        left: 2px;
+        top: -4px;
+        width: 6px;
+        height: 5px;
+        background: #2b3a3f;
+        border-radius: 2px;
+      }
+      @keyframes glow {
+        0%,
+        100% {
+          opacity: 0.55;
+          transform: scale(0.92);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.08);
+        }
+      }
+      .flake {
+        position: fixed;
+        top: -10px;
+        border-radius: 50%;
+        background: #fff;
+        z-index: 0;
+        pointer-events: none;
+        animation: snowfall linear infinite;
+      }
+      @keyframes snowfall {
+        from {
+          transform: translate(0, -5vh);
+        }
+        to {
+          transform: translate(var(--dx), 108vh);
+        }
+      }
+
+      /* ---------- top buttons ---------- */
+      .round {
+        position: fixed;
+        z-index: 30;
+        top: calc(env(safe-area-inset-top, 0px) + 32px);
+        width: clamp(44px, 7.6vmin, 58px);
+        height: clamp(44px, 7.6vmin, 58px);
+        border-radius: 50%;
+        border: 3px solid #fff;
+        background: var(--red);
+        font-size: clamp(22px, 4.2vmin, 32px);
+        cursor: pointer;
+        color: #fff;
+        font-family: var(--font);
+        font-weight: 700;
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .round:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+      }
+      #back {
+        left: calc(env(safe-area-inset-left, 0px) + 12px);
+      }
+      #mute {
+        right: calc(env(safe-area-inset-right, 0px) + 12px);
+      }
+      #mute.off {
+        background: #5d7078;
+      }
+
+      /* ---------- screens ---------- */
+      .screen {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--top) calc(env(safe-area-inset-right, 0px) + 14px)
+          calc(env(safe-area-inset-bottom, 0px) + 12px)
+          calc(env(safe-area-inset-left, 0px) + 14px);
+        gap: 3vmin;
+        text-align: center;
+      }
+      .screen.active {
+        display: flex;
+      }
+      h1 {
+        font-family: var(--title);
+        font-size: clamp(34px, 9vmin, 72px);
+        line-height: 1.05;
+        color: #fff;
+        font-weight: 700;
+        text-shadow:
+          0 4px 0 var(--red),
+          0 0 26px rgba(255, 207, 74, 0.55);
+      }
+      .sub {
+        font-size: clamp(15px, 3.2vmin, 26px);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        color: #5a1a00;
+        background: var(--gold);
+        padding: 0.1em 0.9em;
+        border-radius: 40px;
+        box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3);
+      }
+      .choices {
+        display: flex;
+        gap: clamp(12px, 3vmin, 28px);
+        flex-wrap: wrap;
+        justify-content: center;
+        width: min(94vw, 900px);
+      }
+      .big {
+        font-family: var(--font);
+        color: #fff;
+        cursor: pointer;
+        border: 4px solid rgba(255, 255, 255, 0.9);
+        border-radius: clamp(18px, 3.6vmin, 30px);
+        padding: clamp(12px, 2.4vmin, 24px) clamp(18px, 4vmin, 40px);
+        min-width: clamp(150px, 30vmin, 260px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6vmin;
+        box-shadow:
+          0 8px 0 rgba(0, 0, 0, 0.35),
+          0 14px 26px rgba(0, 0, 0, 0.3);
+        transition:
+          transform 0.12s,
+          box-shadow 0.12s;
+      }
+      .big:active {
+        transform: translateY(6px);
+        box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+      }
+      .big b {
+        font-size: clamp(24px, 5.2vmin, 44px);
+        font-weight: 700;
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+      }
+      .big small {
+        font-size: clamp(13px, 2.6vmin, 21px);
+        font-weight: 500;
+        opacity: 0.95;
+      }
+      .big .pic {
+        height: clamp(40px, 10vmin, 80px);
+        width: auto;
+        filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35));
+      }
+      .easy {
+        background: linear-gradient(160deg, #38c172, #14753a);
+      }
+      .hard {
+        background: linear-gradient(160deg, #ff5a6e, #b81830);
+      }
+      .blue {
+        background: linear-gradient(160deg, #5bc0f8, #1b73c4);
+      }
+      .alt {
+        background: linear-gradient(160deg, #ffc83d, #e08a00);
+      }
+
+      /* ---------- game ---------- */
+      #game {
+        justify-content: flex-start;
+        gap: 1.2vmin;
+        padding-top: calc(var(--top) - 14px);
+      }
+      #hud {
+        display: flex;
+        gap: clamp(8px, 2.4vmin, 26px);
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        font-size: clamp(15px, 3.2vmin, 26px);
+        font-weight: 700;
+        color: var(--gold);
+        flex: none;
+      }
+      #hud span {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 30px;
+        padding: 3px 16px;
+        white-space: nowrap;
+      }
+      #prog {
+        flex: none;
+        width: min(80vw, 520px);
+        height: clamp(10px, 1.8vmin, 16px);
+        border-radius: 20px;
+        border: 2px solid #fff;
+        background: rgba(255, 255, 255, 0.15);
+        overflow: hidden;
+      }
+      #progFill {
+        display: block;
+        height: 100%;
+        width: 0;
+        background: repeating-linear-gradient(
+          -45deg,
+          var(--red) 0 8px,
+          #fff 8px 16px
+        );
+        transition: width 0.4s;
+      }
+
+      /* the game card has a candy-cane border */
+      #bCard {
+        flex: 1;
+        min-height: 0;
+        width: min(96vw, 860px);
+        display: flex;
+        flex-direction: column;
+        gap: 1.2vmin;
+        padding: clamp(8px, 2vmin, 18px);
+        border: 6px solid transparent;
+        border-radius: 28px;
+        background:
+          linear-gradient(#0a3340, #0a3340) padding-box,
+          repeating-linear-gradient(45deg, var(--red) 0 12px, #fff 12px 24px)
+            border-box;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+        overflow: hidden;
+      }
+      #bPicBox {
+        flex: 1 1 0;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      #bPic {
+        max-width: 90%;
+        max-height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 5px 6px rgba(0, 0, 0, 0.4));
+        animation: pop 0.4s;
+      }
+      @keyframes pop {
+        0% {
+          transform: scale(0.7);
+          opacity: 0;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      #bSay {
+        display: none;
+        position: absolute;
+        right: 2px;
+        bottom: 2px;
+        width: clamp(44px, 8vmin, 60px);
+        height: clamp(44px, 8vmin, 60px);
+        border-radius: 50%;
+        border: 3px solid #fff;
+        background: linear-gradient(160deg, #5bc0f8, #1b73c4);
+        font-size: clamp(20px, 4vmin, 30px);
+        cursor: pointer;
+        color: #fff;
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+      }
+      #bSay:active {
+        transform: translateY(3px);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+      }
+      #bCtl {
+        flex: none;
+        display: flex;
+        flex-direction: column;
+        gap: clamp(6px, 1.4vmin, 12px);
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      #inst {
+        font-size: clamp(14px, 3vmin, 24px);
+        color: var(--gold);
+        font-weight: 700;
+      }
+
+      /* where the sentence is built */
+      #zone {
+        display: flex;
+        flex-wrap: wrap;
+        gap: clamp(6px, 1.4vmin, 10px);
+        align-items: center;
+        align-content: flex-start;
+        justify-content: center;
+        min-height: clamp(64px, 12vmin, 100px);
+        padding: clamp(6px, 1.4vmin, 12px);
+        border: 4px dashed var(--gold);
+        border-radius: 18px;
+        background: var(--cream);
+        transition:
+          border-color 0.2s,
+          background 0.2s;
+      }
+      #zone.over {
+        border-color: #fff;
+        background: #fff3d1;
+      }
+      #zone.correct {
+        border: 4px solid var(--green);
+        background: #e8ffe8;
+      }
+      #zone.wrong {
+        border-color: var(--bad);
+        background: #ffe9e9;
+        animation: shake 0.4s;
+      }
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-8px);
+        }
+        75% {
+          transform: translateX(8px);
+        }
+      }
+      #ph {
+        color: #7a8f96;
+        font-size: clamp(14px, 3vmin, 22px);
+        font-style: italic;
+        font-weight: 500;
+      }
+
+      /* word bank */
+      #bank {
+        display: flex;
+        flex-wrap: wrap;
+        gap: clamp(6px, 1.4vmin, 10px);
+        justify-content: center;
+        align-content: flex-start;
+        min-height: clamp(56px, 10vmin, 84px);
+        padding: clamp(6px, 1.4vmin, 10px);
+        border-radius: 18px;
+        background: rgba(0, 0, 0, 0.22);
+      }
+
+      /* the word chips: little baubles in Christmas colours */
+      .chip {
+        touch-action: none;
+        font-family: var(--font);
+        font-weight: 700;
+        font-size: clamp(18px, 4.2vmin, 32px);
+        line-height: 1.2;
+        color: #fff;
+        padding: 0.22em 0.7em;
+        border-radius: 14px;
+        border: 3px solid #fff;
+        text-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+        cursor: grab;
+        white-space: nowrap;
+        flex-shrink: 0;
+        animation: pop 0.3s backwards;
+      }
+      .chip.k0 {
+        background: linear-gradient(160deg, #ff5a6e, #b81830);
+      }
+      .chip.k1 {
+        background: linear-gradient(160deg, #38c172, #14753a);
+      }
+      .chip.k2 {
+        background: linear-gradient(160deg, #5bc0f8, #1b73c4);
+      }
+      .chip.k3 {
+        background: linear-gradient(160deg, #b57bff, #6b32c9);
+      }
+      .chip.k4 {
+        background: linear-gradient(160deg, #ffc83d, #e08a00);
+      }
+      .chip.lift {
+        opacity: 0.25;
+      }
+      .chip.ghost {
+        position: fixed;
+        z-index: 60;
+        pointer-events: none;
+        animation: none;
+        transform: scale(1.08) rotate(-2deg);
+        box-shadow: 0 10px 18px rgba(0, 0, 0, 0.4);
+      }
+      .chip.ok {
+        outline: 4px solid var(--green);
+      }
+      .chip.bad {
+        outline: 4px solid var(--bad);
+      }
+      .chip.locked {
+        cursor: default;
+      }
+
+      #fb {
+        min-height: 1.4em;
+        font-size: clamp(15px, 3.3vmin, 26px);
+        font-weight: 700;
+      }
+      #fb.good {
+        color: var(--green);
+      }
+      #fb.bad {
+        color: var(--gold);
+      }
+
+      .btns {
+        display: flex;
+        gap: clamp(8px, 2vmin, 16px);
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .act {
+        font-family: var(--font);
+        font-weight: 700;
+        font-size: clamp(18px, 3.8vmin, 28px);
+        color: #fff;
+        cursor: pointer;
+        padding: 0.3em 1.1em;
+        border-radius: 50px;
+        border: 4px solid #fff;
+        box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35);
+      }
+      .act:active {
+        transform: translateY(4px);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+      }
+      .act.grey {
+        background: linear-gradient(160deg, #8a97a0, #55646d);
+      }
+      .act.green {
+        background: linear-gradient(160deg, #38c172, #14753a);
+      }
+      .act.blue {
+        background: linear-gradient(160deg, #5bc0f8, #1b73c4);
+      }
+      /* landscape: picture on the left, the sentence on the right */
+      @media (orientation: landscape) {
+        #bCard {
+          flex-direction: row;
+          gap: 2vw;
+        }
+        #bPicBox {
+          flex: 0.7 1 0;
+          height: 100%;
+        }
+        #bCtl {
+          flex: 1.4 1 0;
+          justify-content: center;
+          height: 100%;
+        }
+      }
+      @media (orientation: landscape) and (max-height: 500px) {
+        .screen {
+          gap: 1.6vh;
+        }
+        h1 {
+          font-size: clamp(24px, 10vh, 50px);
+        }
+        .sub {
+          font-size: clamp(13px, 5vh, 22px);
+        }
+        #hud {
+          font-size: clamp(13px, 4.4vh, 20px);
+        }
+        .chip {
+          font-size: clamp(15px, 5.4vh, 24px);
+        }
+        #zone {
+          min-height: clamp(48px, 15vh, 70px);
+        }
+        #bank {
+          min-height: clamp(44px, 14vh, 64px);
+        }
+        .act {
+          font-size: clamp(15px, 5vh, 22px);
+        }
+      }
+
+      /* ---------- results ---------- */
+      #result {
+        justify-content: flex-start;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 2vmin;
+        padding-bottom: 30px;
+      }
+      #result h1 {
+        margin-top: auto;
+      }
+      .stars {
+        font-size: clamp(34px, 8vmin, 64px);
+        letter-spacing: 6px;
+      }
+      .stats {
+        display: flex;
+        gap: clamp(10px, 3vmin, 30px);
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .stat {
+        background: rgba(0, 0, 0, 0.32);
+        border-radius: 24px;
+        padding: clamp(8px, 1.6vmin, 16px) clamp(18px, 4vmin, 40px);
+        min-width: clamp(120px, 26vmin, 220px);
+      }
+      .stat small {
+        display: block;
+        font-size: clamp(13px, 2.6vmin, 20px);
+        color: var(--gold);
+        font-weight: 500;
+      }
+      .stat b {
+        font-size: clamp(28px, 7vmin, 56px);
+        font-weight: 700;
+      }
+      #missTitle {
+        font-size: clamp(18px, 4vmin, 30px);
+        color: var(--gold);
+        font-weight: 700;
+      }
+      #missList {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fill,
+          minmax(clamp(150px, 30vmin, 230px), 1fr)
+        );
+        gap: 12px;
+        width: min(96vw, 900px);
+      }
+      .missCard {
+        background: var(--cream);
+        border-radius: 20px;
+        border: 3px solid var(--gold);
+        padding: 8px 8px 10px;
+        color: #0f4a2c;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+      .missCard img {
+        width: 60%;
+        height: clamp(50px, 11vmin, 90px);
+        object-fit: contain;
+      }
+      .missCard .w {
+        font-size: clamp(14px, 2.8vmin, 20px);
+        font-weight: 700;
+        line-height: 1.2;
+      }
+      #perfect {
+        font-size: clamp(20px, 4.6vmin, 34px);
+        color: var(--green);
+        font-weight: 700;
+      }
+      #result .choices {
+        margin-top: 1vmin;
+        margin-bottom: auto;
+      }
+      #result .choices .big {
+        min-width: clamp(130px, 24vmin, 210px);
+        padding: clamp(10px, 2vmin, 18px) clamp(14px, 3vmin, 30px);
+      }
+      .fall {
+        position: absolute;
+        top: -60px;
+        font-size: clamp(24px, 5vmin, 44px);
+        animation: confall linear forwards;
+        pointer-events: none;
+        z-index: 5;
+      }
+      @keyframes confall {
+        to {
+          transform: translateY(115vh) rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="lights"></div>
+    <div id="sky"></div>
+
+    <button id="back" class="round" aria-label="Back">&#8592;</button>
+    <button
+      id="mute"
+      class="round"
+      aria-label="Mute music"
+      title="Music on/off"
+    >
+      🔊
+    </button>
+
+    <!-- screen 1: mode -->
+    <section id="modeScreen" class="screen active">
+      <h1>Sentence Builder</h1>
+      <div class="sub">Put the words in the right order</div>
+      <div class="choices">
+        <button class="big easy" id="btnEasy">
+          <img class="pic" src="images/snowman.png" alt="" />
+          <b>Easy</b><small>Short sentences</small>
+        </button>
+        <button class="big hard" id="btnHard">
+          <img class="pic" src="images/sleigh.png" alt="" />
+          <b>Difficult</b><small>Longer sentences</small>
+        </button>
+      </div>
+    </section>
+
+    <!-- screen 2: game -->
+    <section id="game" class="screen">
+      <div id="hud">
+        <span id="hudQ">Sentence 1/10</span><span id="hudScore">⭐ 0</span
+        ><span id="hudTime">⏱ 0:00</span>
+      </div>
+      <div id="prog"><i id="progFill"></i></div>
+      <div id="bCard">
+        <div id="bPicBox">
+          <img id="bPic" alt="" />
+          <button id="bSay" aria-label="Hear the sentence">🔊</button>
+        </div>
+        <div id="bCtl">
+          <div id="inst">Tap or drag the words to build the sentence</div>
+          <div id="zone">
+            <span id="ph">Put the words here...</span>
+          </div>
+          <div id="bank"></div>
+          <div id="fb"></div>
+          <div class="btns">
+            <button class="act grey" id="reset">↺ Reset</button>
+            <button class="act green" id="check">✓ Check</button>
+            <button class="act blue" id="next" style="display: none">
+              Next ▶
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- screen 3: results -->
+    <section id="result" class="screen">
+      <h1 id="resTitle">Great job!</h1>
+      <div class="stars" id="resStars"></div>
+      <div class="stats">
+        <div class="stat"><small>Score</small><b id="resScore">0/10</b></div>
+        <div class="stat"><small>Time</small><b id="resTime">0:00</b></div>
+      </div>
+      <div id="missTitle"></div>
+      <div id="perfect" style="display: none">
+        Every sentence right first time! 🎄
+      </div>
+      <div id="missList"></div>
+      <div class="choices">
+        <button class="big alt" id="btnAgain"><b>Play again</b></button>
+        <button class="big blue" id="btnModes"><b>Modes</b></button>
+      </div>
+    </section>
+
+    <script>
+      /* ===== settings ===== */
+      var MUSIC_VOLUME = 0.1; // background music level (0 to 1)
+      var SFX_VOLUME = 0.25; // jingle level
+      var TEMPO_BPM = 138;
+      var VOICE_RATE = 0.85; // speaking speed (lower = slower)
+      var SENTENCES_PER_GAME = 10; // how many sentences are drawn each game
+      var IMG_FOLDER = "images/";
+
+      /* image file, sentence. Put a SPACE before every ? . ! so they become their own word chip. */
+      var EASY = [
+        ["santa.png", "I see Santa ."],
+        ["reindeer.png", "The reindeer is brown ."],
+        ["sleigh.png", "Look at the sleigh !"],
+        ["elf.png", "The elf is small ."],
+        ["snowman.png", "I made a snowman ."],
+        ["snowflake.png", "I see a snowflake ."],
+        ["tree.png", "I like the Christmas tree ."],
+        ["star.png", "The star is yellow ."],
+        ["decoration.png", "I like the decoration ."],
+        ["present.png", "I got a present ."],
+        ["wrapping-paper.png", "I need wrapping paper ."],
+        ["toys.png", "I have new toys ."],
+        ["stocking.png", "The stocking is red ."],
+        ["candy-cane.png", "I want a candy cane ."],
+        ["candle.png", "The candle is bright ."],
+        ["bell.png", "I hear a bell ."],
+        ["wreath.png", "The wreath is green ."],
+        ["christmas-card.png", "I made a Christmas card ."],
+      ];
+      var HARD = [
+        ["santa.png", "Santa brings presents to all the children ."],
+        ["reindeer.png", "Can you see the reindeer in the snow ?"],
+        ["sleigh.png", "The sleigh flies over the snowy town ."],
+        ["elf.png", "The elf makes toys in the workshop ."],
+        ["snowman.png", "We made a big snowman in the garden ."],
+        ["snowflake.png", "A snowflake fell on my nose ."],
+        ["tree.png", "We put a star on the Christmas tree ."],
+        ["star.png", "Can you see the bright star ?"],
+        ["decoration.png", "I put a decoration on the tree ."],
+        ["present.png", "My dad gave me a big present ."],
+        ["wrapping-paper.png", "I wrap the box in wrapping paper ."],
+        ["toys.png", "Santa puts the toys in his sack ."],
+        ["stocking.png", "I hang my stocking by the fireplace ."],
+        ["candy-cane.png", "Do you want a candy cane ?"],
+        ["candle.png", "She lights a candle on the table ."],
+        ["bell.png", "The bell rings loudly on Christmas Eve ."],
+        ["wreath.png", "We hang a green wreath on the door ."],
+        ["christmas-card.png", "I send a Christmas card to my friend ."],
+      ];
+
+      var $ = function (id) {
+        return document.getElementById(id);
+      };
+      function shuffle(a) {
+        a = a.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i];
+          a[i] = a[j];
+          a[j] = t;
+        }
+        return a;
+      }
+      /* "I see Santa ." -> "I see Santa." */
+      function pretty(text) {
+        return text.replace(/ ([?.!,])/g, "$1");
+      }
+
+      /* ===== twinkling string lights ===== */
+      var LIGHT_COLORS = [
+        "#ff4d5e",
+        "#ffd54a",
+        "#4ade80",
+        "#5bc0f8",
+        "#ff9ad5",
+      ];
+      function buildLights() {
+        var box = $("lights");
+        box.innerHTML = "";
+        var inset = parseFloat(getComputedStyle(box).height) - 30 || 0;
+        var gap = 32;
+        var n = Math.ceil(window.innerWidth / gap) + 1;
+        for (var i = 0; i < n; i++) {
+          var b = document.createElement("div");
+          b.className = "bulb";
+          var sag = Math.sin((Math.PI * (i % 6)) / 6) * 8;
+          b.style.left = i * gap + 4 + "px";
+          b.style.top = inset + 5 + sag + "px";
+          b.style.setProperty("--c", LIGHT_COLORS[i % LIGHT_COLORS.length]);
+          b.style.animationDelay = -((i * 0.37) % 1.8) + "s";
+          box.appendChild(b);
+        }
+      }
+      buildLights();
+      window.addEventListener("resize", buildLights);
+
+      /* ===== snowfall ===== */
+      (function () {
+        var sky = $("sky");
+        for (var i = 0; i < 40; i++) {
+          var f = document.createElement("div");
+          f.className = "flake";
+          var s = 3 + Math.random() * 6;
+          f.style.width = s + "px";
+          f.style.height = s + "px";
+          f.style.left = Math.random() * 100 + "vw";
+          f.style.opacity = 0.4 + Math.random() * 0.5;
+          f.style.animationDuration = 8 + Math.random() * 9 + "s";
+          f.style.animationDelay = -Math.random() * 16 + "s";
+          f.style.setProperty("--dx", Math.random() * 16 - 8 + "vw");
+          sky.appendChild(f);
+        }
+      })();
+
+      /* ===== mute state (shared with the other pages) ===== */
+      var muted = false;
+      try {
+        muted = localStorage.getItem("christmasMuted") === "1";
+      } catch (e) {}
+      var muteBtn = $("mute");
+      function showMute() {
+        muteBtn.textContent = muted ? "🔇" : "🔊";
+        muteBtn.classList.toggle("off", muted);
+        muteBtn.setAttribute(
+          "aria-label",
+          muted ? "Unmute music" : "Mute music",
+        );
+      }
+      showMute();
+
+      /* ===== music: a gentle "snow waltz" in G major (original, 3 beats a bar) ===== */
+      var ctx = null,
+        master = null,
+        sfxGain = null,
+        timer = null,
+        started = false;
+      var events = [],
+        evIndex = 0,
+        loopStart = 0,
+        beat = 60 / TEMPO_BPM,
+        LOOP_BEATS = 24; // 8 bars of 3 beats
+      function hz(m) {
+        return 440 * Math.pow(2, (m - 69) / 12);
+      }
+
+      (function buildSong() {
+        // G Em C D | G Em Am D
+        var roots = [43, 40, 48, 50, 43, 40, 45, 50];
+        var chords = [
+          [59, 62, 67],
+          [59, 64, 67],
+          [60, 64, 67],
+          [57, 62, 66],
+          [59, 62, 67],
+          [59, 64, 67],
+          [60, 64, 69],
+          [57, 62, 66],
+        ];
+        for (var b = 0; b < 8; b++) {
+          var t = b * 3;
+          events.push({ t: t, m: [roots[b]], d: 1.2, v: 0.6, w: "sine" });
+          events.push({
+            t: t + 1,
+            m: chords[b],
+            d: 0.5,
+            v: 0.14,
+            w: "triangle",
+          });
+          events.push({
+            t: t + 2,
+            m: chords[b],
+            d: 0.5,
+            v: 0.14,
+            w: "triangle",
+          });
+        }
+        var mel = [
+          [0, 79, 1],
+          [1, 83, 1],
+          [2, 86, 1],
+          [3, 88, 1.5],
+          [4.5, 86, 0.5],
+          [5, 83, 1],
+          [6, 84, 1],
+          [7, 79, 1],
+          [8, 76, 1],
+          [9, 81, 1],
+          [10, 78, 1],
+          [11, 74, 1],
+          [12, 79, 1],
+          [13, 83, 1],
+          [14, 86, 1],
+          [15, 91, 1.5],
+          [16.5, 88, 0.5],
+          [17, 86, 1],
+          [18, 84, 1],
+          [19, 81, 1],
+          [20, 76, 1],
+          [21, 81, 1],
+          [22, 78, 1],
+          [23, 74, 1],
+        ];
+        mel.forEach(function (n) {
+          events.push({
+            t: n[0],
+            m: [n[1]],
+            d: n[2] * 0.9,
+            v: 0.38,
+            w: "triangle",
+            pluck: true,
+            bell: true,
+          });
+        });
+        events.sort(function (a, b) {
+          return a.t - b.t;
+        });
+      })();
+
+      function playNote(freq, when, durBeats, vol, wave, pluck, bell) {
+        var dur = durBeats * beat;
+        var o = ctx.createOscillator(),
+          g = ctx.createGain();
+        o.type = wave;
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.0001, when);
+        g.gain.linearRampToValueAtTime(vol, when + 0.012);
+        g.gain.exponentialRampToValueAtTime(
+          0.0001,
+          when + dur + (pluck ? 0.2 : 0.3),
+        );
+        o.connect(g);
+        g.connect(master);
+        o.start(when);
+        o.stop(when + dur + 0.5);
+        if (bell) {
+          var o2 = ctx.createOscillator(),
+            g2 = ctx.createGain();
+          o2.type = "sine";
+          o2.frequency.value = freq * 2;
+          g2.gain.setValueAtTime(0.0001, when);
+          g2.gain.linearRampToValueAtTime(vol * 0.25, when + 0.01);
+          g2.gain.exponentialRampToValueAtTime(0.0001, when + dur * 0.6 + 0.25);
+          o2.connect(g2);
+          g2.connect(master);
+          o2.start(when);
+          o2.stop(when + dur + 0.4);
+        }
+      }
+      function schedule() {
+        if (!ctx) return;
+        while (true) {
+          var e = events[evIndex];
+          var when = loopStart + e.t * beat;
+          if (when > ctx.currentTime + 0.5) break;
+          if (when >= ctx.currentTime - 0.05) {
+            for (var i = 0; i < e.m.length; i++)
+              playNote(hz(e.m[i]), when, e.d, e.v, e.w, e.pluck, e.bell);
+          }
+          evIndex++;
+          if (evIndex >= events.length) {
+            evIndex = 0;
+            loopStart += LOOP_BEATS * beat;
+          }
+        }
+      }
+      function startMusic() {
+        if (started) {
+          if (ctx && ctx.state === "suspended") ctx.resume();
+          return;
+        }
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        ctx = new AC();
+        master = ctx.createGain();
+        master.gain.value = muted ? 0 : MUSIC_VOLUME;
+        master.connect(ctx.destination);
+        sfxGain = ctx.createGain();
+        sfxGain.gain.value = muted ? 0 : SFX_VOLUME;
+        sfxGain.connect(ctx.destination);
+        loopStart = ctx.currentTime + 0.2;
+        evIndex = 0;
+        timer = setInterval(schedule, 100);
+        started = true;
+        if (ctx.state === "suspended") ctx.resume();
+      }
+      /* music starts on the first tap (browsers need a tap) */
+      function firstTap() {
+        document.removeEventListener("click", firstTap, true);
+        document.removeEventListener("touchend", firstTap, true);
+        document.removeEventListener("pointerup", firstTap, true);
+        if (!muted) startMusic();
+      }
+      document.addEventListener("click", firstTap, true);
+      document.addEventListener("touchend", firstTap, true);
+      document.addEventListener("pointerup", firstTap, true);
+
+      muteBtn.addEventListener("click", function () {
+        muted = !muted;
+        try {
+          localStorage.setItem("christmasMuted", muted ? "1" : "0");
+        } catch (e) {}
+        showMute();
+        if (!muted && !started) startMusic();
+        if (ctx) {
+          master.gain.setTargetAtTime(
+            muted ? 0 : MUSIC_VOLUME,
+            ctx.currentTime,
+            0.05,
+          );
+          sfxGain.gain.setTargetAtTime(
+            muted ? 0 : SFX_VOLUME,
+            ctx.currentTime,
+            0.05,
+          );
+        }
+      });
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden && window.speechSynthesis) speechSynthesis.cancel();
+        if (!ctx) return;
+        if (document.hidden) ctx.suspend();
+        else ctx.resume();
+      });
+
+      /* ===== audio keep-alive ===== */
+      try {
+        if (navigator.audioSession) navigator.audioSession.type = "playback"; // iPhone: play even with the silent switch on
+      } catch (e) {}
+      function wakeAudio() {
+        if (ctx && !muted && !document.hidden && ctx.state !== "running") {
+          var p = ctx.resume();
+          if (p && p.catch) p.catch(function () {});
+        }
+      }
+      setInterval(wakeAudio, 1000);
+      ["touchend", "click"].forEach(function (ev) {
+        document.addEventListener(ev, wakeAudio, true);
+      });
+
+      /* one sound: freq, delay, length, wave, volume, optional glide-to freq */
+      function blip(freq, delay, dur, type, vol, glideTo) {
+        if (!ctx || muted) return;
+        var t = ctx.currentTime + (delay || 0);
+        var o = ctx.createOscillator(),
+          g = ctx.createGain();
+        o.type = type || "sine";
+        o.frequency.setValueAtTime(freq, t);
+        if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t + dur);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(vol || 1, t + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g);
+        g.connect(sfxGain);
+        o.start(t);
+        o.stop(t + dur + 0.05);
+      }
+      function sfxTap() {
+        blip(700, 0, 0.06, "triangle", 0.6);
+      }
+      function jingleRight() {
+        [784, 988, 1175, 1568].forEach(function (f, i) {
+          blip(f, i * 0.08, 0.28, "triangle", 1);
+        });
+        blip(2349, 0.34, 0.5, "sine", 0.3);
+      }
+      function jingleWrong() {
+        blip(330, 0, 0.3, "triangle", 0.9, 200);
+        blip(262, 0.25, 0.4, "triangle", 0.9, 130);
+      }
+      function jingleWin() {
+        [523, 659, 784, 1047, 784, 1047, 1319].forEach(function (f, i) {
+          blip(f, i * 0.14, 0.3, "triangle", 1);
+        });
+      }
+
+      /* ===== voice (the device's built-in speech) ===== */
+      var voice = null;
+      function pickVoice() {
+        if (!window.speechSynthesis) return;
+        var vs = speechSynthesis.getVoices(),
+          pick = null;
+        for (var i = 0; i < vs.length; i++) {
+          var l = (vs[i].lang || "").replace("_", "-");
+          if (l === "en-US") {
+            pick = vs[i];
+            break;
+          }
+          if (!pick && l.toLowerCase().indexOf("en") === 0) pick = vs[i];
+        }
+        voice = pick;
+      }
+      if (window.speechSynthesis) {
+        pickVoice();
+        speechSynthesis.onvoiceschanged = pickVoice;
+      }
+      function speak(text, delay) {
+        if (!window.speechSynthesis) return;
+        var go = function () {
+          if (current !== "game") return;
+          try {
+            speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(text);
+            u.lang = "en-US";
+            if (voice) u.voice = voice;
+            u.rate = VOICE_RATE;
+            u.pitch = 1.05;
+            speechSynthesis.speak(u);
+          } catch (e) {}
+        };
+        if (delay) setTimeout(go, delay);
+        else go();
+      }
+
+      /* ===== screens ===== */
+      var screens = { mode: "modeScreen", game: "game", result: "result" };
+      var current = "mode";
+      function show(name) {
+        current = name;
+        for (var k in screens)
+          $(screens[k]).classList.toggle("active", k === name);
+        if (name !== "game") stopClock();
+        if (name !== "result") clearConfetti();
+        if (window.speechSynthesis) speechSynthesis.cancel();
+      }
+      $("back").addEventListener("click", function () {
+        if (current === "mode") location.href = "index.html";
+        else show("mode");
+      });
+      $("btnEasy").addEventListener("click", function () {
+        startGame("easy");
+      });
+      $("btnHard").addEventListener("click", function () {
+        startGame("hard");
+      });
+      $("btnAgain").addEventListener("click", function () {
+        startGame(mode);
+      });
+      $("btnModes").addEventListener("click", function () {
+        show("mode");
+      });
+
+      /* ===== timer ===== */
+      var t0 = 0,
+        clock = null;
+      function fmt(ms) {
+        var s = Math.floor(ms / 1000),
+          m = Math.floor(s / 60);
+        s = s % 60;
+        return m + ":" + (s < 10 ? "0" : "") + s;
+      }
+      function tick() {
+        $("hudTime").textContent = "⏱ " + fmt(Date.now() - t0);
+      }
+      function stopClock() {
+        if (clock) {
+          clearInterval(clock);
+          clock = null;
+        }
+      }
+
+      /* ===== game ===== */
+      var mode = "easy",
+        order = [],
+        qi = 0,
+        score = 0,
+        missed = [],
+        words = [],
+        locked = false,
+        triedWrong = false;
+      var zone = $("zone"),
+        bank = $("bank"),
+        ph = $("ph"),
+        fb = $("fb");
+
+      function startGame(m) {
+        mode = m;
+        var pool = m === "easy" ? EASY : HARD;
+        order = shuffle(pool).slice(0, SENTENCES_PER_GAME);
+        qi = 0;
+        score = 0;
+        missed = [];
+        show("game");
+        t0 = Date.now();
+        tick();
+        stopClock();
+        clock = setInterval(tick, 500);
+        loadQuestion();
+      }
+
+      function loadQuestion() {
+        var q = order[qi];
+        words = q[1].split(" ");
+        locked = false;
+        triedWrong = false;
+        fb.textContent = "";
+        fb.className = "";
+        zone.className = "";
+        $("check").style.display = "";
+        $("reset").style.display = "";
+        $("next").style.display = "none";
+        $("bSay").style.display = "none";
+        $("hudQ").textContent = "Sentence " + (qi + 1) + "/" + order.length;
+        $("hudScore").textContent = "⭐ " + score;
+        $("progFill").style.width = (qi / order.length) * 100 + "%";
+
+        var im = $("bPic");
+        im.style.visibility = "";
+        im.onerror = function () {
+          im.style.visibility = "hidden";
+        };
+        im.style.animation = "none";
+        void im.offsetWidth;
+        im.style.animation = "";
+        im.src = IMG_FOLDER + q[0];
+
+        zone.innerHTML = "";
+        zone.appendChild(ph);
+        bank.innerHTML = "";
+        /* shuffle, but never start already in the right order */
+        var mix = shuffle(words),
+          tries = 0;
+        while (mix.join(" ") === words.join(" ") && tries++ < 20)
+          mix = shuffle(words);
+        mix.forEach(function (w, i) {
+          var chip = document.createElement("div");
+          chip.className = "chip k" + Math.floor(Math.random() * 5);
+          chip.textContent = w;
+          chip.style.animationDelay = i * 0.04 + "s";
+          chip.addEventListener("pointerdown", chipDown);
+          bank.appendChild(chip);
+        });
+        updatePh();
+      }
+
+      function updatePh() {
+        ph.style.display = zone.querySelector(".chip") ? "none" : "inline";
+      }
+      function clearMarks() {
+        zone.classList.remove("wrong");
+        Array.prototype.forEach.call(
+          zone.querySelectorAll(".chip"),
+          function (c) {
+            c.classList.remove("ok", "bad");
+          },
+        );
+      }
+
+      /* ---------- tap or drag (works with mouse and touch) ---------- */
+      var drag = null;
+      function chipDown(e) {
+        if (locked) return;
+        e.preventDefault();
+        clearMarks();
+        var chip = e.currentTarget,
+          r = chip.getBoundingClientRect();
+        drag = {
+          chip: chip,
+          id: e.pointerId,
+          sx: e.clientX,
+          sy: e.clientY,
+          ox: e.clientX - r.left,
+          oy: e.clientY - r.top,
+          w: r.width,
+          moved: false,
+          ghost: null,
+        };
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        window.addEventListener("pointercancel", onCancel);
+      }
+      function boxAt(x, y) {
+        var el = document.elementFromPoint(x, y);
+        return el ? el.closest("#zone, #bank") : null;
+      }
+      function onMove(e) {
+        if (!drag || e.pointerId !== drag.id) return;
+        var d = Math.sqrt(
+          Math.pow(e.clientX - drag.sx, 2) + Math.pow(e.clientY - drag.sy, 2),
+        );
+        if (!drag.moved && d > 7) {
+          drag.moved = true;
+          var g = drag.chip.cloneNode(true);
+          g.className = drag.chip.className + " ghost";
+          g.classList.remove("ok", "bad");
+          g.style.width = drag.w + "px";
+          document.body.appendChild(g);
+          drag.ghost = g;
+          drag.chip.classList.add("lift");
+        }
+        if (drag.moved) {
+          drag.ghost.style.left = e.clientX - drag.ox + "px";
+          drag.ghost.style.top = e.clientY - drag.oy + "px";
+          zone.classList.toggle("over", boxAt(e.clientX, e.clientY) === zone);
+        }
+      }
+      /* where in the answer row should a dropped chip go? (works over several rows) */
+      function dropIndex(x, y, chip) {
+        var chips = Array.prototype.filter.call(
+          zone.querySelectorAll(".chip"),
+          function (c) {
+            return c !== chip;
+          },
+        );
+        for (var i = 0; i < chips.length; i++) {
+          var r = chips[i].getBoundingClientRect();
+          if (y < r.top) return i;
+          if (y <= r.bottom && x < r.left + r.width / 2) return i;
+        }
+        return chips.length;
+      }
+      function endDrag() {
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onCancel);
+        if (drag && drag.ghost) drag.ghost.remove();
+        if (drag) drag.chip.classList.remove("lift");
+        zone.classList.remove("over");
+      }
+      function onCancel() {
+        endDrag();
+        drag = null;
+      }
+      function onUp(e) {
+        if (!drag || e.pointerId !== drag.id) return;
+        var d = drag,
+          chip = d.chip;
+        endDrag();
+        drag = null;
+        if (!d.moved) {
+          /* a tap sends the word to the other box */
+          if (chip.parentNode === zone) bank.appendChild(chip);
+          else zone.appendChild(chip);
+          sfxTap();
+        } else {
+          var box = boxAt(e.clientX, e.clientY);
+          if (box === zone) {
+            var idx = dropIndex(e.clientX, e.clientY, chip);
+            var others = Array.prototype.filter.call(
+              zone.querySelectorAll(".chip"),
+              function (c) {
+                return c !== chip;
+              },
+            );
+            if (idx >= others.length) zone.appendChild(chip);
+            else zone.insertBefore(chip, others[idx]);
+            sfxTap();
+          } else if (box === bank) {
+            bank.appendChild(chip);
+            sfxTap();
+          }
+        }
+        updatePh();
+      }
+
+      /* ---------- check / reset / next ---------- */
+      $("check").addEventListener("click", function () {
+        if (locked) return;
+        var chips = Array.prototype.slice.call(zone.querySelectorAll(".chip"));
+        if (chips.length < words.length) {
+          fb.className = "bad";
+          fb.textContent = "Put all the words in the box first!";
+          zone.classList.remove("wrong");
+          void zone.offsetWidth;
+          zone.classList.add("wrong");
+          return;
+        }
+        var typed = chips.map(function (c) {
+          return c.textContent;
+        });
+        if (typed.join(" ") === words.join(" ")) {
+          locked = true;
+          zone.classList.remove("wrong");
+          zone.classList.add("correct");
+          chips.forEach(function (c) {
+            c.classList.add("locked");
+          });
+          fb.className = "good";
+          fb.textContent = "Correct! 🎉";
+          if (!triedWrong) score++;
+          $("hudScore").textContent = "⭐ " + score;
+          jingleRight();
+          $("check").style.display = "none";
+          $("reset").style.display = "none";
+          $("next").textContent =
+            qi >= order.length - 1 ? "Finish ▶" : "Next ▶";
+          $("next").style.display = "";
+          $("bSay").style.display = "block";
+          speak(pretty(words.join(" ")), 900);
+        } else {
+          if (!triedWrong) {
+            triedWrong = true;
+            missed.push(order[qi]);
+          }
+          zone.classList.remove("wrong");
+          void zone.offsetWidth;
+          zone.classList.add("wrong");
+          chips.forEach(function (c, i) {
+            c.classList.add(c.textContent === words[i] ? "ok" : "bad");
+          });
+          fb.className = "bad";
+          fb.textContent = "Not quite! Green words are in the right place.";
+          jingleWrong();
+        }
+      });
+      $("reset").addEventListener("click", function () {
+        if (locked) return;
+        fb.textContent = "";
+        fb.className = "";
+        clearMarks();
+        Array.prototype.forEach.call(
+          zone.querySelectorAll(".chip"),
+          function (c) {
+            bank.appendChild(c);
+          },
+        );
+        updatePh();
+      });
+      $("next").addEventListener("click", function () {
+        qi++;
+        if (qi >= order.length) finish();
+        else loadQuestion();
+      });
+      $("bSay").addEventListener("click", function () {
+        speak(pretty(words.join(" ")), 0);
+      });
+
+      /* ===== results ===== */
+      function finish() {
+        stopClock();
+        var ms = Date.now() - t0,
+          total = order.length,
+          pct = score / total;
+        $("resScore").textContent = score + "/" + total;
+        $("resTime").textContent = fmt(ms);
+        $("resTitle").textContent =
+          pct === 1 ? "Perfect!" : pct >= 0.6 ? "Great job!" : "Good try!";
+        var stars = pct >= 0.9 ? 3 : pct >= 0.6 ? 2 : 1,
+          s = "";
+        for (var i = 0; i < 3; i++) s += i < stars ? "⭐" : "☆";
+        $("resStars").textContent = s;
+
+        var list = $("missList");
+        list.innerHTML = "";
+        if (missed.length) {
+          $("missTitle").textContent = "Sentences to practise:";
+          $("perfect").style.display = "none";
+          missed.forEach(function (q) {
+            var c = document.createElement("div");
+            c.className = "missCard";
+            var im = document.createElement("img");
+            im.alt = "";
+            im.src = IMG_FOLDER + q[0];
+            im.onerror = function () {
+              im.style.visibility = "hidden";
+            };
+            var t = document.createElement("div");
+            t.className = "w";
+            t.textContent = pretty(q[1]);
+            c.appendChild(im);
+            c.appendChild(t);
+            list.appendChild(c);
+          });
+        } else {
+          $("missTitle").textContent = "";
+          $("perfect").style.display = "block";
+        }
+        show("result");
+        $("result").scrollTop = 0;
+        jingleWin();
+        confetti();
+      }
+      function confetti() {
+        var box = $("result"),
+          em = ["🎄", "⭐", "🎁", "❄️", "🔔", "🍬"];
+        for (var i = 0; i < 24; i++) {
+          var s = document.createElement("div");
+          s.className = "fall";
+          s.textContent = em[i % em.length];
+          s.style.left = Math.random() * 100 + "%";
+          s.style.animationDuration = 3 + Math.random() * 3 + "s";
+          s.style.animationDelay = Math.random() * 2 + "s";
+          box.appendChild(s);
+        }
+      }
+      function clearConfetti() {
+        Array.prototype.forEach.call(
+          document.querySelectorAll(".fall"),
+          function (n) {
+            n.remove();
+          },
+        );
+      }
+
+      /* preload images quietly */
+      EASY.forEach(function (q) {
+        var im = new Image();
+        im.src = IMG_FOLDER + q[0];
+      });
+    </script>
+  </body>
+</html>

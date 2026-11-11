@@ -364,9 +364,14 @@
         --rib: #ffcf4a;
         --ink: #4f2095;
       }
-
+      .c-build {
+        --c1: #ff8fb1;
+        --c2: #d6336c;
+        --rib: #ffffff;
+        --ink: #a01f4f;
+      }
       /* portrait: 2 + 2 + 1 (last present sits in the middle) */
-      .card:nth-child(5) {
+      .card:nth-child(5):last-child {
         grid-column: 1 / -1;
         justify-self: center;
         width: calc(50% - clamp(5px, 1.3vmin, 13px));
@@ -377,14 +382,14 @@
           gap: 2vmin;
         }
         .menu {
-          grid-template-columns: repeat(5, 1fr);
+          grid-template-columns: repeat(6, minmax(0, 1fr));
           width: min(96vw, 1200px);
         }
         .card {
           aspect-ratio: auto;
           height: min(44vh, 290px);
         }
-        .card:nth-child(5) {
+        .card:nth-child(5):last-child {
           grid-column: auto;
           justify-self: stretch;
           width: auto;
@@ -601,6 +606,11 @@
         <a class="card c-word" href="wordup.html"
           ><img src="images/tree.png" data-emo="🎄" alt="" /><span class="lbl"
             >Word up</span
+          ></a
+        >
+        <a class="card c-build" href="sentencebuilder.html"
+          ><img src="images/elf.png" data-emo="🧝" alt="" /><span class="lbl"
+            >Sentence Builder</span
           ></a
         >
         <a class="card c-sheet" href="worksheets.html"
@@ -988,9 +998,9 @@
         "images/santa.png",
         "images/reindeer.png",
         "images/snowman.png",
-        "images/christmas-tree.png",
-        "images/gift.png",
-        "images/icon.png",
+        "images/tree.png",
+        "images/present.png",
+        "images/Cicon.jpg",
       ];
       var loaded = 0,
         t0 = Date.now();
