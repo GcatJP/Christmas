@@ -1497,6 +1497,13 @@
         document.removeEventListener("click", firstTap, true);
         document.removeEventListener("touchend", firstTap, true);
         document.removeEventListener("pointerup", firstTap, true);
+        try {
+          if (window.speechSynthesis) {
+            var u0 = new SpeechSynthesisUtterance(" ");
+            u0.volume = 0;
+            speechSynthesis.speak(u0);
+          }
+        } catch (e) {}
         if (!muted) startMusic();
       }
       document.addEventListener("click", firstTap, true);
