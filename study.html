@@ -1307,11 +1307,6 @@
         sfxGain = null,
         started = false;
 
-      /* let iPhone play speech even with the silent switch on */
-      try {
-        if (navigator.audioSession) navigator.audioSession.type = "playback";
-      } catch (e) {}
-
       function startAudio() {
         if (started) {
           if (ctx && ctx.state === "suspended") ctx.resume();
@@ -1406,15 +1401,16 @@
       function pickVoice() {
         if (!window.speechSynthesis) return;
         var vs = speechSynthesis.getVoices(),
-          pick = null;
+          pick = null,
+          any = null;
         for (var i = 0; i < vs.length; i++) {
           var l = (vs[i].lang || "").replace("_", "-");
-          if (l === "en-US" && vs[i].localService) {
-            pick = vs[i];
-            break;
-          }
+          if (l === "en-US") {
+            if (!any) any = vs[i];
+            if (vs[i].localService && !pick) pick = vs[i];
+          } else if (!any && l.toLowerCase().indexOf("en") === 0) any = vs[i];
         }
-        voice = pick; // null = let the device choose by language
+        voice = pick || any; // null = let the device choose by language
       }
       if (window.speechSynthesis) {
         pickVoice();
@@ -1437,7 +1433,7 @@
                   u.rate = VOICE_RATE;
                   u.pitch = 1.05;
                   u.volume = 1;
-                  lastUtter = u;
+                  lastUtter = u; // keep a reference so it is not garbage-collected mid-speech
                   speechSynthesis.speak(u);
                 } catch (e) {}
               },
