@@ -1014,8 +1014,8 @@
         if (loaded === imgs.length) {
           var wait = Math.max(0, MIN_LOAD_MS - (Date.now() - t0));
           setTimeout(function () {
-            document.querySelector("#loader h2").textContent =
-              "マナーモードをOFFにしてね 🔊";
+            document.querySelector("#loader h2").innerHTML =
+              "マナーモードを<br>OFFにしてね 🔊";
             startBtn.style.display = "block";
           }, wait);
         }
