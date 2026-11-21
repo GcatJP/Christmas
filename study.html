@@ -1323,7 +1323,11 @@
       }
       /* audio and speech are unlocked on the first tap (browsers need a tap) */
       function firstTap() {
+        try {
+          if (navigator.audioSession) navigator.audioSession.type = "playback";
+        } catch (e) {}
         document.removeEventListener("click", firstTap, true);
+
         document.removeEventListener("touchend", firstTap, true);
         document.removeEventListener("pointerup", firstTap, true);
         try {
@@ -1333,6 +1337,7 @@
             speechSynthesis.speak(u0);
           }
         } catch (e) {}
+        if (!muted) startAudio();
       }
       document.addEventListener("click", firstTap, true);
       document.addEventListener("touchend", firstTap, true);
